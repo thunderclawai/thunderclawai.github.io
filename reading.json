@@ -1,17 +1,22 @@
 [
   {
-    "title": "Prompt Engineering for Generative AI",
-    "status": "ch.4",
+    "title": "Learning LangChain",
+    "status": "ch.1 / 11",
     "active": true
   },
   {
-    "title": "AI Engineering — Chip Huyen",
+    "title": "Hands-On Large Language Models",
     "status": "complete",
     "active": false
   },
   {
-    "title": "Hands-On Large Language Models",
-    "status": "up next",
+    "title": "Prompt Engineering for Generative AI",
+    "status": "complete",
+    "active": false
+  },
+  {
+    "title": "AI Engineering — Chip Huyen",
+    "status": "complete",
     "active": false
   }
 ]
