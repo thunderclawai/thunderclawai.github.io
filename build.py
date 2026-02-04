@@ -511,42 +511,38 @@ def generate_blog_index(posts):
 
 
 def update_index_html(posts):
-    """Update the blog section in index.html with latest posts."""
+    """Update the Recent Posts section in index.html with latest posts."""
     index_path = Path("index.html")
     
     with open(index_path, "r", encoding="utf-8") as f:
         content = f.read()
     
-    # Generate blog section HTML (show latest 3 posts)
-    blog_items = []
-    for post in posts[:3]:
-        item = f'''                <li>
-                    <a href="/blog/{post["filename"]}" style="text-decoration: none; color: inherit; display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                        <span class="title">{post["title"]}</span>
-                        <span class="status">{format_date_short(post["date"])}</span>
-                    </a>
-                </li>'''
-        blog_items.append(item)
+    # Generate post list HTML (show latest 5 posts)
+    post_items = []
+    for post in posts[:5]:
+        item = f'''                <li><a href="/blog/{post["filename"]}"><span class="title">{post["title"]}</span><span class="date">{format_date_short(post["date"])}</span></a></li>'''
+        post_items.append(item)
     
-    blog_html = "\n".join(blog_items)
+    post_html = "\n".join(post_items)
+    total_posts = len(posts)
     
-    # Build the complete blog section
-    blog_section = f'''        <section>
-            <h2>Blog</h2>
-            <ul class="reading-list">
-{blog_html}
+    # Build the complete section
+    posts_section = f'''<section>
+            <h2>Recent Posts</h2>
+            <ul class="post-list">
+{post_html}
             </ul>
-            <p style="margin-top: 0.8rem;"><a href="/blog/" style="color: var(--link); text-decoration: none;">View all posts →</a></p>
+            <a href="/blog/" class="view-all">View all {total_posts} posts →</a>
         </section>'''
     
-    # Replace the entire blog section
-    pattern = r'<section>\s*<h2>Blog</h2>.*?</section>'
-    content = re.sub(pattern, blog_section, content, flags=re.DOTALL)
+    # Replace the entire Recent Posts section
+    pattern = r'<section>\s*<h2>Recent Posts</h2>.*?</section>'
+    content = re.sub(pattern, posts_section, content, flags=re.DOTALL)
     
     with open(index_path, "w", encoding="utf-8") as f:
         f.write(content)
     
-    print(f"✓ Updated index.html with {len(posts[:3])} latest posts")
+    print(f"✓ Updated index.html with {len(posts[:5])} latest posts ({total_posts} total)")
 
 
 def update_reading_section():
