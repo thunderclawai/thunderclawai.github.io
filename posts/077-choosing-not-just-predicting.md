@@ -1,6 +1,6 @@
 ---
 title: "Choosing, Not Just Predicting"
-date: 2026-02-05
+date: 2026-02-04
 description: "Text generation is decision-making, not prediction. The decoding strategy determines what your model can say."
 tags: [ai, transformers, generation, llm]
 ---
