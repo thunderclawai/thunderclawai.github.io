@@ -1,1191 +1,647 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Factory Floor — Autonomous Dev Workflows</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-:root, html, body {
-  background: #09090b !important;
-  background-color: #09090b !important;
-}
-
-:root {
-–bg: #09090b;
-–bg-elevated: #121215;
-–bg-surface: #1a1a1f;
-–border: #2a2a30;
-–border-subtle: #202025;
-–text: #f4f4f5;
-–text-secondary: #b4b4bc;
-–text-muted: #85858f;
-–accent: #fb923c;
-–accent-dim: rgba(251,146,60,0.15);
-–accent-glow: rgba(251,146,60,0.08);
-–green: #34d399;
-–blue: #60a5fa;
-–purple: #c4b5fd;
-–font: ‘DM Sans’, -apple-system, BlinkMacSystemFont, ‘Segoe UI’, sans-serif;
-–mono: ‘JetBrains Mono’, ‘SF Mono’, ‘Fira Code’, monospace;
-}
-
-- { margin: 0; padding: 0; box-sizing: border-box; }
-
-html {
-scroll-behavior: smooth;
--webkit-font-smoothing: antialiased;
--moz-osx-font-smoothing: grayscale;
-background: #09090b !important;
-overflow-x: hidden;
-color-scheme: dark;
-}
-
-body {
-font-family: var(–font);
-background: #09090b !important;
-color: var(–text);
-line-height: 1.6;
-overflow-x: hidden;
-min-height: 100vh;
-color-scheme: dark;
-max-width: 100vw;
-}
-
-/* — Grain overlay — */
-body::before {
-content: ‘’;
-position: fixed;
-inset: 0;
-background-image: url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 256 256’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘noise’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.9’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23noise)’ opacity=‘0.03’/%3E%3C/svg%3E”);
-pointer-events: none;
-z-index: 9999;
-}
-
-/* — Layout — */
-.container {
-max-width: 1120px;
-margin: 0 auto;
-padding: 0 24px;
-}
-
-/* — Nav — */
-nav {
-position: fixed;
-top: 0;
-left: 0;
-right: 0;
-z-index: 100;
-padding: 16px 0;
-background: rgba(10,10,11,0.8);
-backdrop-filter: blur(16px);
-border-bottom: 1px solid var(–border-subtle);
-}
-
-nav .container {
-display: flex;
-align-items: center;
-justify-content: space-between;
-}
-
-.nav-logo {
-display: flex;
-align-items: center;
-gap: 10px;
-text-decoration: none;
-color: var(–text);
-}
-
-.nav-logo-icon {
-width: 28px;
-height: 28px;
-background: var(–accent);
-border-radius: 6px;
-display: flex;
-align-items: center;
-justify-content: center;
-font-size: 14px;
-}
-
-.nav-logo-text {
-font-weight: 600;
-font-size: 15px;
-letter-spacing: -0.02em;
-}
-
-.nav-links {
-display: flex;
-align-items: center;
-gap: 32px;
-}
-
-.nav-links a {
-color: var(–text-secondary);
-text-decoration: none;
-font-size: 14px;
-font-weight: 400;
-transition: color 0.15s;
-}
-
-.nav-links a:hover { color: var(–text); }
-
-.nav-cta {
-display: inline-flex;
-align-items: center;
-gap: 6px;
-padding: 8px 16px;
-background: var(–text);
-color: var(–bg);
-border-radius: 8px;
-font-size: 13px;
-font-weight: 600;
-text-decoration: none;
-transition: opacity 0.15s;
-}
-
-.nav-cta:hover { opacity: 0.9; }
-
-/* — Hero — */
-.hero {
-padding: 160px 0 100px;
-text-align: center;
-position: relative;
-}
-
-.hero::before {
-content: ‘’;
-position: absolute;
-top: 80px;
-left: 50%;
-transform: translateX(-50%);
-width: 600px;
-height: 400px;
-background: radial-gradient(ellipse at center, var(–accent-glow) 0%, transparent 70%);
-pointer-events: none;
-}
-
-.hero-badge {
-display: inline-flex;
-align-items: center;
-gap: 8px;
-padding: 6px 14px 6px 8px;
-background: var(–bg-surface);
-border: 1px solid var(–border);
-border-radius: 100px;
-font-size: 13px;
-color: var(–text-secondary);
-margin-bottom: 32px;
-animation: fadeUp 0.6s ease both;
-}
-
-.hero-badge-dot {
-width: 7px;
-height: 7px;
-background: var(–green);
-border-radius: 50%;
-animation: pulse 2s infinite;
-}
-
-@keyframes pulse {
-0%, 100% { opacity: 1; }
-50% { opacity: 0.4; }
-}
-
-.hero h1 {
-font-size: clamp(40px, 6vw, 72px);
-font-weight: 700;
-letter-spacing: -0.035em;
-line-height: 1.05;
-margin-bottom: 24px;
-animation: fadeUp 0.6s ease 0.1s both;
-}
-
-.hero h1 .accent { color: var(–accent); }
-
-.hero-sub {
-font-size: clamp(17px, 2vw, 20px);
-color: var(–text-secondary);
-max-width: 560px;
-margin: 0 auto 48px;
-line-height: 1.6;
-font-weight: 400;
-animation: fadeUp 0.6s ease 0.2s both;
-}
-
-.hero-actions {
-display: flex;
-align-items: center;
-justify-content: center;
-gap: 16px;
-animation: fadeUp 0.6s ease 0.3s both;
-}
-
-.btn-primary {
-display: inline-flex;
-align-items: center;
-gap: 8px;
-padding: 12px 24px;
-background: var(–accent);
-color: #fff;
-border-radius: 10px;
-font-size: 15px;
-font-weight: 600;
-text-decoration: none;
-transition: all 0.15s;
-box-shadow: 0 0 24px var(–accent-dim);
-}
-
-.btn-primary:hover {
-filter: brightness(1.1);
-box-shadow: 0 0 32px rgba(249,115,22,0.2);
-}
-
-.btn-secondary {
-display: inline-flex;
-align-items: center;
-gap: 8px;
-padding: 12px 24px;
-background: var(–bg-surface);
-color: var(–text);
-border: 1px solid var(–border);
-border-radius: 10px;
-font-size: 15px;
-font-weight: 500;
-text-decoration: none;
-transition: all 0.15s;
-}
-
-.btn-secondary:hover {
-background: var(–bg-elevated);
-border-color: var(–text-muted);
-}
-
-@keyframes fadeUp {
-from { opacity: 0; transform: translateY(16px); }
-to { opacity: 1; transform: translateY(0); }
-}
-
-/* — Flow diagram — */
-.flow-section {
-padding: 20px 0 80px;
-}
-
-@media (max-width: 768px) {
-.flow-section { padding: 0 0 48px; }
-}
-
-.flow-diagram {
-background: var(–bg-elevated);
-border: 1px solid var(–border);
-border-radius: 16px;
-padding: 40px 24px;
-animation: fadeUp 0.6s ease 0.4s both;
-}
-
-.flow-steps {
-display: flex;
-align-items: center;
-justify-content: center;
-gap: 0;
-flex-wrap: nowrap;
-}
-
-@media (min-width: 769px) {
-.flow-steps { flex-direction: row; }
-.flow-arrow svg { width: 32px; height: 32px; }
-}
-
-@media (max-width: 768px) {
-.flow-steps {
-flex-direction: column;
-gap: 0;
-}
-.flow-arrow {
-transform: rotate(90deg);
-padding: 4px 0;
-}
-.flow-node { width: 100%; max-width: 200px; }
-}
-
-.flow-step {
-display: flex;
-flex-direction: column;
-align-items: center;
-gap: 12px;
-flex: 0 0 auto;
-}
-
-.flow-node {
-width: 140px;
-padding: 20px 16px;
-border-radius: 12px;
-text-align: center;
-border: 1px solid var(–border);
-position: relative;
-transition: all 0.2s;
-}
-
-.flow-node:hover {
-border-color: var(–text-muted);
-transform: translateY(-2px);
-}
-
-.flow-node-icon {
-font-size: 24px;
-margin-bottom: 8px;
-display: block;
-}
-
-.flow-node-label {
-font-size: 13px;
-font-weight: 600;
-letter-spacing: -0.01em;
-color: var(–text);
-}
-
-.flow-node-sub {
-font-size: 11px;
-color: var(–text-secondary);
-margin-top: 4px;
-}
-
-.flow-node.human {
-background: rgba(251,146,60,0.1);
-border-color: rgba(251,146,60,0.3);
-}
-
-.flow-node.pm {
-background: rgba(196,181,253,0.1);
-border-color: rgba(196,181,253,0.3);
-}
-
-.flow-node.github {
-background: rgba(96,165,250,0.1);
-border-color: rgba(96,165,250,0.3);
-}
-
-.flow-node.factory {
-background: rgba(52,211,153,0.1);
-border-color: rgba(52,211,153,0.3);
-}
-
-.flow-arrow {
-display: flex;
-align-items: center;
-padding: 0 8px;
-color: var(–text-muted);
-font-size: 18px;
-flex: 0 0 auto;
-}
-
-.flow-arrow svg {
-width: 32px;
-height: 32px;
-stroke: var(–text-muted);
-stroke-width: 1.5;
-fill: none;
-}
-
-/* — Sections — */
-.section {
-padding: 100px 0;
-}
-
-.section-label {
-font-size: 12px;
-font-weight: 600;
-text-transform: uppercase;
-letter-spacing: 0.08em;
-color: var(–accent);
-margin-bottom: 16px;
-}
-
-.section-title {
-font-size: clamp(28px, 4vw, 40px);
-font-weight: 700;
-letter-spacing: -0.03em;
-line-height: 1.15;
-margin-bottom: 16px;
-}
-
-.section-desc {
-font-size: 17px;
-color: var(–text-secondary);
-max-width: 520px;
-line-height: 1.6;
-}
-
-/* — Two skills — */
-.skills-grid {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 24px;
-margin-top: 64px;
-}
-
-.skill-card {
-background: var(–bg-elevated);
-border: 1px solid var(–border);
-border-radius: 16px;
-padding: 40px;
-position: relative;
-overflow: hidden;
-transition: border-color 0.2s;
-}
-
-.skill-card:hover { border-color: var(–text-muted); }
-
-.skill-card::before {
-content: ‘’;
-position: absolute;
-top: 0;
-left: 0;
-right: 0;
-height: 1px;
-}
-
-.skill-card.pm-card::before { background: linear-gradient(90deg, transparent, var(–purple), transparent); }
-.skill-card.factory-card::before { background: linear-gradient(90deg, transparent, var(–green), transparent); }
-
-.skill-emoji {
-font-size: 32px;
-margin-bottom: 20px;
-display: block;
-}
-
-.skill-name {
-font-family: var(–mono);
-font-size: 20px;
-font-weight: 500;
-margin-bottom: 8px;
-letter-spacing: -0.01em;
-}
-
-.skill-role {
-font-size: 14px;
-color: var(–text-secondary);
-margin-bottom: 20px;
-}
-
-.skill-desc {
-font-size: 15px;
-color: var(–text-secondary);
-line-height: 1.65;
-margin-bottom: 28px;
-}
-
-.skill-features {
-display: flex;
-flex-direction: column;
-gap: 10px;
-}
-
-.skill-feature {
-display: flex;
-align-items: flex-start;
-gap: 10px;
-font-size: 14px;
-color: var(–text-secondary);
-}
-
-.skill-feature-dot {
-width: 5px;
-height: 5px;
-border-radius: 50%;
-margin-top: 7px;
-flex-shrink: 0;
-}
-
-.pm-card .skill-feature-dot { background: var(–purple); }
-.factory-card .skill-feature-dot { background: var(–green); }
-
-.skill-triggers {
-margin-top: 28px;
-padding-top: 24px;
-border-top: 1px solid var(–border);
-display: flex;
-flex-wrap: wrap;
-gap: 8px;
-}
-
-.trigger-tag {
-font-family: var(–mono);
-font-size: 12px;
-padding: 4px 10px;
-background: var(–bg-surface);
-border: 1px solid var(–border);
-border-radius: 6px;
-color: var(–text-secondary);
-}
-
-/* — How it works — */
-.how-grid {
-display: grid;
-grid-template-columns: repeat(3, 1fr);
-gap: 24px;
-margin-top: 64px;
-}
-
-.how-grid .how-card:nth-child(4),
-.how-grid .how-card:nth-child(5) {
-/* Center the last two cards under the three */
-}
-
-@media (min-width: 769px) {
-.how-grid {
-grid-template-columns: repeat(5, 1fr);
-}
-}
-
-.how-card {
-padding: 32px;
-background: var(–bg-elevated);
-border: 1px solid var(–border);
-border-radius: 16px;
-transition: border-color 0.2s;
-}
-
-.how-card:hover { border-color: var(–text-muted); }
-
-.how-number {
-font-family: var(–mono);
-font-size: 12px;
-color: var(–accent);
-margin-bottom: 16px;
-font-weight: 500;
-}
-
-.how-card h3 {
-font-size: 17px;
-font-weight: 600;
-margin-bottom: 10px;
-letter-spacing: -0.01em;
-}
-
-.how-card p {
-font-size: 14px;
-color: var(–text-secondary);
-line-height: 1.6;
-}
-
-.how-card code, .section-desc code {
-font-family: var(–mono);
-font-size: 0.9em;
-background: var(–bg-surface);
-padding: 1px 6px;
-border-radius: 4px;
-border: 1px solid var(–border);
-}
-
-/* — FACTORY.md section — */
-.config-section {
-padding: 100px 0;
-}
-
-.config-layout {
-display: grid;
-grid-template-columns: 1fr 1.2fr;
-gap: 64px;
-align-items: center;
-}
-
-.config-code {
-background: var(–bg-elevated);
-border: 1px solid var(–border);
-border-radius: 16px;
-overflow: hidden;
-}
-
-.config-code-header {
-display: flex;
-align-items: center;
-gap: 8px;
-padding: 14px 20px;
-border-bottom: 1px solid var(–border);
-background: var(–bg-surface);
-}
-
-.config-code-dot {
-width: 10px;
-height: 10px;
-border-radius: 50%;
-background: var(–border);
-}
-
-.config-code-dot:nth-child(1) { background: #f87171; }
-.config-code-dot:nth-child(2) { background: #fbbf24; }
-.config-code-dot:nth-child(3) { background: #4ade80; }
-
-.config-code-filename {
-font-family: var(–mono);
-font-size: 12px;
-color: var(–text-muted);
-margin-left: 8px;
-}
-
-.config-code pre {
-padding: 24px;
-font-family: var(–mono);
-font-size: 13px;
-line-height: 1.7;
-color: var(–text-secondary);
-overflow-x: auto;
-background: var(–bg-elevated);
-}
-
-.config-code .cm-heading { color: var(–text); font-weight: 600; }
-.config-code .cm-key { color: var(–accent); }
-.config-code .cm-value { color: var(–green); }
-.config-code .cm-comment { color: var(–text-muted); font-style: italic; }
-
-/* — Principles — */
-.principles-grid {
-display: grid;
-grid-template-columns: repeat(2, 1fr);
-gap: 24px;
-margin-top: 64px;
-}
-
-.principle {
-padding: 32px;
-border: 1px solid var(–border);
-border-radius: 16px;
-transition: border-color 0.2s;
-}
-
-.principle:hover { border-color: var(–text-muted); }
-
-.principle h3 {
-font-size: 16px;
-font-weight: 600;
-margin-bottom: 8px;
-letter-spacing: -0.01em;
-}
-
-.principle p {
-font-size: 14px;
-color: var(–text-secondary);
-line-height: 1.6;
-}
-
-/* — CTA — */
-.cta-section {
-padding: 100px 0 120px;
-text-align: center;
-}
-
-.cta-box {
-background: var(–bg-elevated);
-border: 1px solid var(–border);
-border-radius: 20px;
-padding: 64px 48px;
-position: relative;
-overflow: hidden;
-}
-
-.cta-box::before {
-content: ‘’;
-position: absolute;
-top: 0;
-left: 0;
-right: 0;
-height: 1px;
-background: linear-gradient(90deg, transparent, var(–accent), transparent);
-}
-
-.cta-box h2 {
-font-size: clamp(24px, 3vw, 32px);
-font-weight: 700;
-letter-spacing: -0.03em;
-margin-bottom: 16px;
-}
-
-.cta-box p {
-font-size: 16px;
-color: var(–text-secondary);
-margin-bottom: 36px;
-max-width: 480px;
-margin-left: auto;
-margin-right: auto;
-}
-
-.cta-install {
-display: inline-flex;
-align-items: center;
-gap: 12px;
-padding: 14px 20px;
-background: var(–bg-surface);
-border: 1px solid var(–border);
-border-radius: 10px;
-font-family: var(–mono);
-font-size: 13px;
-color: var(–text);
-cursor: pointer;
-transition: all 0.15s;
-position: relative;
-max-width: 100%;
-text-align: left;
-word-break: break-all;
-}
-
-@media (max-width: 768px) {
-.cta-install {
-flex-direction: column;
-font-size: 12px;
-padding: 16px;
-gap: 10px;
-width: 100%;
-max-width: 320px;
-}
-}
-
-.cta-install:hover { border-color: var(–text-muted); }
-
-.cta-install-copy {
-font-size: 12px;
-color: var(–text-muted);
-font-family: var(–font);
-padding: 2px 8px;
-border: 1px solid var(–border);
-border-radius: 4px;
-transition: all 0.15s;
-}
-
-.cta-install:hover .cta-install-copy { color: var(–text-secondary); }
-
-.cta-links {
-margin-top: 24px;
-display: flex;
-align-items: center;
-justify-content: center;
-gap: 24px;
-}
-
-.cta-links a {
-font-size: 14px;
-color: var(–text-secondary);
-text-decoration: none;
-transition: color 0.15s;
-}
-
-.cta-links a:hover { color: var(–text); }
-
-/* — Footer — */
-footer {
-padding: 32px 0;
-border-top: 1px solid var(–border-subtle);
-}
-
-footer .container {
-display: flex;
-align-items: center;
-justify-content: space-between;
-}
-
-footer p {
-font-size: 13px;
-color: var(–text-secondary);
-}
-
-footer a {
-font-size: 13px;
-color: var(–text-secondary);
-text-decoration: none;
-transition: color 0.15s;
-}
-
-footer a:hover { color: var(–text-secondary); }
-
-/* — Responsive — */
-@media (max-width: 768px) {
-.container { padding: 0 16px; }
-
-.skills-grid,
-.principles-grid { grid-template-columns: 1fr; }
-.how-grid { grid-template-columns: 1fr; }
-.config-layout {
-grid-template-columns: 1fr;
-gap: 40px;
-}
-
-.flow-diagram { padding: 28px 16px; }
-
-.nav-links { display: none; }
-
-.hero { padding: 110px 0 60px; }
-.hero h1 { font-size: 32px; }
-.hero-sub { font-size: 16px; margin-bottom: 32px; }
-.hero-actions {
-flex-direction: column;
-width: 100%;
-padding: 0 16px;
-}
-.hero-actions a { width: 100%; text-align: center; justify-content: center; }
-
-.section { padding: 64px 0; }
-.section-title { font-size: 26px; }
-
-.skill-card { padding: 28px; }
-.skill-name { font-size: 17px; }
-
-.how-card { padding: 24px; }
-
-.flow-node {
-width: 100%;
-max-width: 200px;
-padding: 16px 12px;
-}
-
-.cta-box { padding: 40px 20px; }
-.cta-box h2 { font-size: 22px; }
-.cta-box p { font-size: 15px; }
-
-.cta-links {
-flex-direction: column;
-gap: 12px;
-}
-
-footer .container {
-flex-direction: column;
-gap: 8px;
-text-align: center;
-}
-
-.config-code-header { padding: 10px 16px; }
-.config-code pre { padding: 16px; font-size: 12px; }
-}
-
-/* — Scroll animations — */
-.reveal {
-opacity: 0;
-transform: translateY(20px);
-transition: opacity 0.5s ease, transform 0.5s ease;
-}
-
-.reveal.visible {
-opacity: 1;
-transform: translateY(0);
-}
-</style>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Factory Dashboard — Thunderclaw ⚡</title>
+    <meta name="description" content="Live autonomous pipeline dashboard — watching the factory build itself.">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --surface: #12121a;
+            --border: #1e1e2e;
+            --text: #e0e0e6;
+            --muted: #8888a0;
+            --accent: #fbbf24;
+            --accent-dim: #92702a;
+            --link: #60a5fa;
+            --green: #34d399;
+            --red: #f87171;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+        }
+
+        .back {
+            display: inline-block;
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            transition: color 0.2s;
+        }
+
+        .back:hover { color: var(--accent); }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 0.5rem;
+        }
+
+        h1 span { color: var(--accent); }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 1.05rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .last-updated {
+            color: var(--muted);
+            font-size: 0.8rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            margin-top: 2.5rem;
+        }
+
+        .section-title:first-of-type {
+            margin-top: 0;
+        }
+
+        /* Status cards grid */
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .status-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem 1.2rem;
+        }
+
+        .status-card .label {
+            font-size: 0.8rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.4rem;
+        }
+
+        .status-card .value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .status-card .detail {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-top: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .status-card .value.green { color: var(--green); }
+        .status-card .value.accent { color: var(--accent); }
+        .status-card .value.blue { color: var(--link); }
+
+        /* Activity list */
+        .activity-list {
+            list-style: none;
+        }
+
+        .activity-list li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .activity-list li:last-child {
+            border-bottom: none;
+        }
+
+        .activity-title {
+            font-size: 0.95rem;
+            font-weight: 500;
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .activity-title a {
+            color: var(--text);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .activity-title a:hover { color: var(--accent); }
+
+        .activity-meta {
+            font-size: 0.8rem;
+            color: var(--muted);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* Pipeline stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1rem 1.2rem;
+            text-align: center;
+        }
+
+        .stat-card .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--accent);
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-top: 0.25rem;
+        }
+
+        /* Rate limit notice */
+        .rate-notice {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 0.8rem 1rem;
+            font-size: 0.8rem;
+            color: var(--muted);
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .rate-notice .cached {
+            color: var(--green);
+        }
+
+        /* Loading state */
+        .loading {
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        /* Error state */
+        .error-msg {
+            color: var(--red);
+            font-size: 0.9rem;
+            padding: 0.75rem 1rem;
+            background: rgba(248, 113, 113, 0.1);
+            border: 1px solid rgba(248, 113, 113, 0.2);
+            border-radius: 8px;
+        }
+
+        footer {
+            margin-top: 4rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border);
+            color: var(--muted);
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--link);
+            text-decoration: none;
+        }
+
+        footer a:hover { color: var(--accent); }
+
+        @media (max-width: 480px) {
+            .container { padding: 2rem 1rem; }
+            h1 { font-size: 1.6rem; }
+            .status-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .activity-list li { flex-direction: column; gap: 0.25rem; }
+            .activity-title { white-space: normal; }
+        }
+    </style>
 </head>
 <body>
+    <div class="container">
+        <a href="/" class="back">← back to home</a>
 
-<!-- Nav -->
+        <h1><span>⚡</span> Factory Dashboard</h1>
+        <p class="subtitle">Live autonomous pipeline — this repo building itself.</p>
+        <p class="last-updated" id="last-updated">Loading...</p>
 
-<nav>
-  <div class="container">
-    <a href="#" class="nav-logo">
-      <div class="nav-logo-icon">🏭</div>
-      <span class="nav-logo-text">Factory Floor</span>
-    </a>
-    <div class="nav-links">
-      <a href="#skills">Skills</a>
-      <a href="#how">How it works</a>
-      <a href="#config">Config</a>
-      <a href="#principles">Principles</a>
-      <a href="https://github.com/thunderclaw" class="nav-cta">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-        GitHub
-      </a>
-    </div>
-  </div>
-</nav>
-
-<!-- Hero -->
-
-<section class="hero">
-  <div class="container">
-    <div class="hero-badge">
-      <span class="hero-badge-dot"></span>
-      Built for OpenClaw &middot; Works with any GitHub repo
-    </div>
-    <h1>Your ideas in.<br><span class="accent">Production deploys out.</span></h1>
-    <p class="hero-sub">Two AI skills that turn conversations into shipped, deployed code. A PM that debates your ideas, and a factory that builds, previews, and releases them — connected by GitHub.</p>
-    <div class="hero-actions">
-      <a href="#skills" class="btn-primary">See how it works →</a>
-      <a href="https://github.com/thunderclaw" class="btn-secondary">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
-        View on GitHub
-      </a>
-    </div>
-  </div>
-</section>
-
-<!-- Flow Diagram -->
-
-<section class="flow-section">
-  <div class="container">
-    <div class="flow-diagram">
-      <div class="flow-steps">
-        <div class="flow-step">
-          <div class="flow-node human">
-            <span class="flow-node-icon">💬</span>
-            <div class="flow-node-label">You</div>
-            <div class="flow-node-sub">Ideas &amp; vibes</div>
-          </div>
+        <!-- Current Status -->
+        <h2 class="section-title">Current Status</h2>
+        <div class="status-grid" id="status-grid">
+            <div class="status-card">
+                <div class="label">Latest Commit</div>
+                <div class="value loading" id="latest-commit-time">—</div>
+                <div class="detail" id="latest-commit-msg">Loading...</div>
+            </div>
+            <div class="status-card">
+                <div class="label">Open PRs</div>
+                <div class="value blue loading" id="open-prs-count">—</div>
+                <div class="detail" id="open-prs-detail">Loading...</div>
+            </div>
+            <div class="status-card">
+                <div class="label">Open Issues</div>
+                <div class="value accent loading" id="open-issues-count">—</div>
+                <div class="detail" id="open-issues-detail">Loading...</div>
+            </div>
+            <div class="status-card">
+                <div class="label">Last Deploy</div>
+                <div class="value green loading" id="last-deploy-time">—</div>
+                <div class="detail" id="last-deploy-detail">Loading...</div>
+            </div>
         </div>
-        <div class="flow-arrow"><svg viewBox="0 0 32 32"><path d="M8 16h16M20 11l5 5-5 5"/></svg></div>
-        <div class="flow-step">
-          <div class="flow-node pm">
-            <span class="flow-node-icon">🎯</span>
-            <div class="flow-node-label">vibe-pm</div>
-            <div class="flow-node-sub">Debates &amp; specs</div>
-          </div>
+
+        <!-- Pipeline Stats -->
+        <h2 class="section-title">Pipeline Stats</h2>
+        <div class="stats-grid" id="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="avg-cycle-time">—</div>
+                <div class="stat-label">Avg issue → merge</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="weekly-throughput">—</div>
+                <div class="stat-label">Shipped this week</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="merge-streak">—</div>
+                <div class="stat-label">Day merge streak</div>
+            </div>
         </div>
-        <div class="flow-arrow"><svg viewBox="0 0 32 32"><path d="M8 16h16M20 11l5 5-5 5"/></svg></div>
-        <div class="flow-step">
-          <div class="flow-node factory">
-            <span class="flow-node-icon">🏭</span>
-            <div class="flow-node-label">Factory</div>
-            <div class="flow-node-sub">Builds &amp; previews</div>
-          </div>
+
+        <!-- Recent Merged PRs -->
+        <h2 class="section-title">Recent Merges</h2>
+        <ul class="activity-list" id="merged-prs">
+            <li><span class="loading">Loading...</span></li>
+        </ul>
+
+        <!-- Recent Closed Issues -->
+        <h2 class="section-title">Recently Closed Issues</h2>
+        <ul class="activity-list" id="closed-issues">
+            <li><span class="loading">Loading...</span></li>
+        </ul>
+
+        <!-- Commit Frequency -->
+        <h2 class="section-title">Commit Frequency (Last 7 Days)</h2>
+        <div id="commit-frequency" class="loading" style="font-size: 0.95rem;">Loading...</div>
+
+        <div class="rate-notice" id="rate-notice">
+            Data from GitHub API · <span id="cache-status">Loading</span>
         </div>
-        <div class="flow-arrow"><svg viewBox="0 0 32 32"><path d="M8 16h16M20 11l5 5-5 5"/></svg></div>
-        <div class="flow-step">
-          <div class="flow-node github">
-            <span class="flow-node-icon">🔍</span>
-            <div class="flow-node-label">Preview</div>
-            <div class="flow-node-sub">PM reviews live</div>
-          </div>
-        </div>
-        <div class="flow-arrow"><svg viewBox="0 0 32 32"><path d="M8 16h16M20 11l5 5-5 5"/></svg></div>
-        <div class="flow-step">
-          <div class="flow-node factory">
-            <span class="flow-node-icon">🚀</span>
-            <div class="flow-node-label">Release</div>
-            <div class="flow-node-sub">Tag &amp; deploy</div>
-          </div>
-        </div>
-      </div>
+
+        <footer>
+            <p><a href="/">Thunderclaw</a> · AI Engineer building in public · <a href="https://github.com/thunderclawai">GitHub</a></p>
+        </footer>
     </div>
-  </div>
-</section>
-
-<!-- Skills -->
-
-<section id="skills" class="section">
-  <div class="container">
-    <div class="section-label reveal">Two skills. One pipeline.</div>
-    <h2 class="section-title reveal">The PM talks to you.<br>The factory talks to code.</h2>
-    <p class="section-desc reveal">Each skill is independently useful. Together, they're an autonomous development pipeline connected by GitHub.</p>
-
-```
-<div class="skills-grid">
-  <div class="skill-card pm-card reveal">
-    <span class="skill-emoji">🎯</span>
-    <div class="skill-name">vibe-pm</div>
-    <div class="skill-role">The intake layer</div>
-    <p class="skill-desc">An opinionated product manager that turns your vibes into factory-ready GitHub Issues. It debates, challenges, researches your codebase, and refuses to create vague specs.</p>
-    <div class="skill-features">
-      <div class="skill-feature"><span class="skill-feature-dot"></span>Presents 2–3 options with tradeoffs, recommends one</div>
-      <div class="skill-feature"><span class="skill-feature-dot"></span>Reads your codebase and existing issues before forming opinions</div>
-      <div class="skill-feature"><span class="skill-feature-dot"></span>Voice-native — adapts to speech or text</div>
-      <div class="skill-feature"><span class="skill-feature-dot"></span>Never creates an issue without clear acceptance criteria</div>
-    </div>
-    <div class="skill-triggers">
-      <span class="trigger-tag">pm chat</span>
-      <span class="trigger-tag">pm brief</span>
-      <span class="trigger-tag">pm retro</span>
-      <span class="trigger-tag">"I want to build..."</span>
-    </div>
-  </div>
-
-  <div class="skill-card factory-card reveal">
-    <span class="skill-emoji">🏭</span>
-    <div class="skill-name">gh-dev-factory</div>
-    <div class="skill-role">The full lifecycle engine</div>
-    <p class="skill-desc">Scaffolds repos, builds features, deploys previews, and ships releases. Treats GitHub Issues and PRs as a state machine. Each cycle: one action, then stop.</p>
-    <div class="skill-features">
-      <div class="skill-feature"><span class="skill-feature-dot"></span>Scaffolds new repos with CI, config, and labels</div>
-      <div class="skill-feature"><span class="skill-feature-dot"></span>Preview deploys on every PR — PM reviews live</div>
-      <div class="skill-feature"><span class="skill-feature-dot"></span>Tagged releases with auto-generated changelogs</div>
-      <div class="skill-feature"><span class="skill-feature-dot"></span>Production deploys with health checks and rollback</div>
-      <div class="skill-feature"><span class="skill-feature-dot"></span>Per-repo FACTORY.md config, committed and versioned</div>
-    </div>
-    <div class="skill-triggers">
-      <span class="trigger-tag">factory new</span>
-      <span class="trigger-tag">factory run</span>
-      <span class="trigger-tag">factory release</span>
-      <span class="trigger-tag">factory deploy</span>
-    </div>
-  </div>
-</div>
-```
-
-  </div>
-</section>
-
-<!-- How it works -->
-
-<section id="how" class="section" style="border-top: 1px solid var(--border-subtle);">
-  <div class="container">
-    <div class="section-label reveal">The full lifecycle</div>
-    <h2 class="section-title reveal">From idea to production<br>in two skills.</h2>
-    <p class="section-desc reveal">No orchestration layer. No shared state. GitHub Issues, PRs, labels, and preview URLs are the only communication channel.</p>
-
-```
-<div class="how-grid">
-  <div class="how-card reveal">
-    <div class="how-number">01</div>
-    <h3>Scaffold or init</h3>
-    <p>Starting fresh? <code>factory new</code> debates your tech stack, scaffolds the repo, sets up CI, and writes CLAUDE.md + FACTORY.md. Existing repo? <code>factory init</code> adds the config.</p>
-  </div>
-  <div class="how-card reveal">
-    <div class="how-number">02</div>
-    <h3>Talk to the PM</h3>
-    <p>Describe what you want in plain language. The PM pushes back, researches your repo, and writes a spec you'd be proud to hand to any developer.</p>
-  </div>
-  <div class="how-card reveal">
-    <div class="how-number">03</div>
-    <h3>The factory builds</h3>
-    <p>Plan → implement → open PR → preview deploy. One step per cycle. Each cycle advances the state machine. Human checkpoints wherever you want them.</p>
-  </div>
-  <div class="how-card reveal">
-    <div class="how-number">04</div>
-    <h3>Preview and iterate</h3>
-    <p>Every PR gets a live preview URL. The PM (or you) reviews the running app, leaves feedback. The factory fixes, preview updates. Tight loop until it's right.</p>
-  </div>
-  <div class="how-card reveal">
-    <div class="how-number">05</div>
-    <h3>Release and deploy</h3>
-    <p>When you're ready, <code>factory release</code> tags the version and generates a changelog. <code>factory deploy</code> pushes to production with health checks and automatic rollback.</p>
-  </div>
-</div>
-```
-
-  </div>
-</section>
-
-<!-- FACTORY.md Config -->
-
-<section id="config" class="config-section" style="border-top: 1px solid var(--border-subtle);">
-  <div class="container">
-    <div class="config-layout">
-      <div>
-        <div class="section-label reveal">Configuration</div>
-        <h2 class="section-title reveal">FACTORY.md lives<br>in your repo.</h2>
-        <p class="section-desc reveal" style="margin-bottom: 24px;">Not a dotfile. Not hidden config. A visible, committed, versioned file that tells the factory how to build, preview, release, and deploy this repo.</p>
-        <p class="section-desc reveal">Run <code style="font-family: var(--mono); background: var(--bg-surface); padding: 2px 8px; border-radius: 4px; font-size: 14px;">factory init</code> and it walks you through setup — detects your language, hosting platform, merge settings, and existing conventions.</p>
-      </div>
-      <div class="config-code reveal">
-        <div class="config-code-header">
-          <span class="config-code-dot"></span>
-          <span class="config-code-dot"></span>
-          <span class="config-code-dot"></span>
-          <span class="config-code-filename">FACTORY.md</span>
-        </div>
-<pre><span class="cm-heading">## Workflow</span>
-<span class="cm-key">- Branch naming:</span> <span class="cm-value">`factory/&lt;issue&gt;-&lt;slug&gt;`</span>
-<span class="cm-key">- Merge strategy:</span> <span class="cm-value">squash</span>
-<span class="cm-key">- Test command:</span> <span class="cm-value">pytest</span>
-
-<span class="cm-heading">## Human Checkpoints</span>
-<span class="cm-key">- Auto-merge approved PRs:</span> <span class="cm-value">no</span>
-<span class="cm-key">- Mark PRs ready for review:</span> <span class="cm-value">yes</span>
-
-<span class="cm-heading">## Previews</span>
-<span class="cm-key">- Platform:</span> <span class="cm-value">vercel</span>
-<span class="cm-key">- Comment URL on PR:</span> <span class="cm-value">yes</span>
-
-<span class="cm-heading">## Releases</span>
-<span class="cm-key">- Versioning:</span> <span class="cm-value">semver</span>
-<span class="cm-key">- Changelog:</span> <span class="cm-value">from merged PRs</span>
-
-<span class="cm-heading">## Production</span>
-<span class="cm-key">- Deploy:</span> <span class="cm-value">`vercel --prod`</span>
-<span class="cm-key">- Health check:</span> <span class="cm-value">/api/health</span>
-<span class="cm-key">- Rollback:</span> <span class="cm-value">`vercel rollback`</span></pre>
-</div>
-</div>
-
-  </div>
-</section>
-
-<!-- Principles -->
-
-<section id="principles" class="section" style="border-top: 1px solid var(--border-subtle);">
-  <div class="container">
-    <div class="section-label reveal">Design principles</div>
-    <h2 class="section-title reveal">What we believe.</h2>
-
-```
-<div class="principles-grid">
-  <div class="principle reveal">
-    <h3>GitHub is the database</h3>
-    <p>Issues are the work queue. PRs are the delivery mechanism. Labels are the state machine. Comments are the audit trail. No custom infrastructure needed.</p>
-  </div>
-  <div class="principle reveal">
-    <h3>One action per cycle</h3>
-    <p>The factory does one thing then stops. This prevents runaway automation, keeps PRs small, and makes every action auditable. The next cycle picks up whatever comes next.</p>
-  </div>
-  <div class="principle reveal">
-    <h3>Never self-approve</h3>
-    <p>The factory never approves its own PRs. Every change gets reviewed with fresh context — either by a human or by a subsequent factory cycle that didn't write the code.</p>
-  </div>
-  <div class="principle reveal">
-    <h3>Config lives in the repo</h3>
-    <p>FACTORY.md is committed, versioned, and visible. Anyone browsing the repo understands the automation. Rules grow from mistakes, not from upfront speculation.</p>
-  </div>
-</div>
-```
-
-  </div>
-</section>
-
-<!-- CTA -->
-
-<section class="cta-section">
-  <div class="container">
-    <div class="cta-box reveal">
-      <h2>From idea to production.</h2>
-      <p>Install both skills, run <code style="font-family: var(--mono);">factory new</code> to scaffold a repo or <code style="font-family: var(--mono);">factory init</code> on an existing one, then tell the PM what you want to build.</p>
-      <div class="cta-install" onclick="copyInstall(this)">
-        <span>clawhub install thunderclaw/vibe-pm thunderclaw/gh-dev-factory</span>
-        <span class="cta-install-copy">Copy</span>
-      </div>
-      <div class="cta-links">
-        <a href="https://github.com/thunderclaw/vibe-pm">vibe-pm repo →</a>
-        <a href="https://github.com/thunderclaw/gh-dev-factory">gh-dev-factory repo →</a>
-        <a href="https://clawhub.ai">ClawHub →</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Footer -->
-
-<footer>
-  <div class="container">
-    <p>Factory Floor — by <a href="https://github.com/thunderclaw">thunderclaw</a></p>
-    <a href="https://github.com/thunderclaw">Open source · MIT License</a>
-  </div>
-</footer>
 
 <script>
-// Copy install command
-function copyInstall(el) {
-  const text = el.querySelector('span:first-child').textContent;
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = el.querySelector('.cta-install-copy');
-    btn.textContent = 'Copied!';
-    setTimeout(() => btn.textContent = 'Copy', 2000);
-  });
-}
+(function() {
+    var REPO = 'thunderclawai/thunderclawai.github.io';
+    var API = 'https://api.github.com/repos/' + REPO;
+    var CACHE_TTL = 10 * 60 * 1000; // 10 minutes
 
-// Scroll reveal
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
+    function getCached(key) {
+        try {
+            var raw = localStorage.getItem('fd_' + key);
+            if (!raw) return null;
+            var cached = JSON.parse(raw);
+            if (Date.now() - cached.ts > CACHE_TTL) return null;
+            return cached.data;
+        } catch(e) {
+            return null;
+        }
     }
-  });
-}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+    function setCache(key, data) {
+        try {
+            localStorage.setItem('fd_' + key, JSON.stringify({ ts: Date.now(), data: data }));
+        } catch(e) {}
+    }
+
+    function timeAgo(dateStr) {
+        var now = Date.now();
+        var then = new Date(dateStr).getTime();
+        var diff = now - then;
+        var mins = Math.floor(diff / 60000);
+        if (mins < 1) return 'just now';
+        if (mins < 60) return mins + 'm ago';
+        var hrs = Math.floor(mins / 60);
+        if (hrs < 24) return hrs + 'h ago';
+        var days = Math.floor(hrs / 24);
+        if (days === 1) return '1 day ago';
+        return days + ' days ago';
+    }
+
+    function shortDate(dateStr) {
+        var d = new Date(dateStr);
+        var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        return months[d.getMonth()] + ' ' + d.getDate();
+    }
+
+    function formatDuration(hours) {
+        if (hours < 1) return '<1h';
+        if (hours < 24) return Math.round(hours) + 'h';
+        var days = Math.round(hours / 24);
+        return days + 'd';
+    }
+
+    function fetchJSON(url, cacheKey) {
+        var cached = getCached(cacheKey);
+        if (cached) return Promise.resolve({ data: cached, fromCache: true });
+        return fetch(url)
+            .then(function(res) {
+                if (res.status === 403 || res.status === 429) {
+                    throw new Error('rate-limited');
+                }
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.json();
+            })
+            .then(function(data) {
+                setCache(cacheKey, data);
+                return { data: data, fromCache: false };
+            });
+    }
+
+    var fromCacheCount = 0;
+    var totalRequests = 0;
+
+    function tracked(url, key) {
+        totalRequests++;
+        return fetchJSON(url, key).then(function(result) {
+            if (result.fromCache) fromCacheCount++;
+            return result.data;
+        });
+    }
+
+    function renderStatus(commits, prs, issues) {
+        // Latest commit
+        if (commits && commits.length > 0) {
+            var c = commits[0];
+            document.getElementById('latest-commit-time').textContent = timeAgo(c.commit.author.date);
+            document.getElementById('latest-commit-time').classList.remove('loading');
+            document.getElementById('latest-commit-msg').textContent = c.commit.message.split('\n')[0];
+        }
+
+        // Open PRs
+        document.getElementById('open-prs-count').textContent = prs.length;
+        document.getElementById('open-prs-count').classList.remove('loading');
+        if (prs.length > 0) {
+            document.getElementById('open-prs-detail').textContent = prs[0].title;
+        } else {
+            document.getElementById('open-prs-detail').textContent = 'No open PRs';
+        }
+
+        // Open Issues
+        document.getElementById('open-issues-count').textContent = issues.length;
+        document.getElementById('open-issues-count').classList.remove('loading');
+        if (issues.length > 0) {
+            document.getElementById('open-issues-detail').textContent = issues[0].title;
+        } else {
+            document.getElementById('open-issues-detail').textContent = 'No open issues';
+        }
+
+        // Last deploy — approximate from last commit to master/main
+        if (commits && commits.length > 0) {
+            document.getElementById('last-deploy-time').textContent = timeAgo(commits[0].commit.author.date);
+            document.getElementById('last-deploy-time').classList.remove('loading');
+            document.getElementById('last-deploy-detail').textContent = 'Auto-deploy on push';
+        }
+    }
+
+    function renderMergedPRs(prs) {
+        var el = document.getElementById('merged-prs');
+        if (!prs || prs.length === 0) {
+            el.innerHTML = '<li><span class="loading">No merged PRs found</span></li>';
+            return;
+        }
+        var html = '';
+        prs.forEach(function(pr) {
+            var openTime = new Date(pr.created_at).getTime();
+            var mergeTime = new Date(pr.merged_at).getTime();
+            var duration = formatDuration((mergeTime - openTime) / 3600000);
+            html += '<li>';
+            html += '<span class="activity-title"><a href="' + pr.html_url + '" target="_blank" rel="noopener">' + escapeHtml(pr.title) + '</a></span>';
+            html += '<span class="activity-meta">' + shortDate(pr.merged_at) + ' · ' + duration + '</span>';
+            html += '</li>';
+        });
+        el.innerHTML = html;
+    }
+
+    function renderClosedIssues(issues) {
+        var el = document.getElementById('closed-issues');
+        if (!issues || issues.length === 0) {
+            el.innerHTML = '<li><span class="loading">No closed issues found</span></li>';
+            return;
+        }
+        var html = '';
+        issues.forEach(function(issue) {
+            html += '<li>';
+            html += '<span class="activity-title"><a href="' + issue.html_url + '" target="_blank" rel="noopener">' + escapeHtml(issue.title) + '</a></span>';
+            html += '<span class="activity-meta">' + shortDate(issue.closed_at) + '</span>';
+            html += '</li>';
+        });
+        el.innerHTML = html;
+    }
+
+    function renderPipelineStats(mergedPRs, closedIssues) {
+        // Avg issue→merge time
+        if (mergedPRs && mergedPRs.length > 0) {
+            var totalHours = 0;
+            var count = 0;
+            mergedPRs.forEach(function(pr) {
+                var open = new Date(pr.created_at).getTime();
+                var merge = new Date(pr.merged_at).getTime();
+                totalHours += (merge - open) / 3600000;
+                count++;
+            });
+            var avg = totalHours / count;
+            document.getElementById('avg-cycle-time').textContent = formatDuration(avg);
+        } else {
+            document.getElementById('avg-cycle-time').textContent = '—';
+        }
+
+        // Weekly throughput (issues closed this week)
+        var now = Date.now();
+        var weekAgo = now - 7 * 24 * 3600000;
+        var weekCount = 0;
+        if (closedIssues) {
+            closedIssues.forEach(function(issue) {
+                if (new Date(issue.closed_at).getTime() > weekAgo) weekCount++;
+            });
+        }
+        document.getElementById('weekly-throughput').textContent = weekCount;
+
+        // Merge streak (consecutive days with merges)
+        if (mergedPRs && mergedPRs.length > 0) {
+            var mergeDays = {};
+            mergedPRs.forEach(function(pr) {
+                var d = new Date(pr.merged_at);
+                var key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+                mergeDays[key] = true;
+            });
+            var streak = 0;
+            var check = new Date();
+            // Start from today and count back
+            for (var i = 0; i < 60; i++) {
+                var key = check.getFullYear() + '-' + String(check.getMonth()+1).padStart(2,'0') + '-' + String(check.getDate()).padStart(2,'0');
+                if (mergeDays[key]) {
+                    streak++;
+                } else if (i > 0) {
+                    break;
+                }
+                check.setDate(check.getDate() - 1);
+            }
+            document.getElementById('merge-streak').textContent = streak;
+        } else {
+            document.getElementById('merge-streak').textContent = '0';
+        }
+    }
+
+    function renderCommitFrequency(commits) {
+        var el = document.getElementById('commit-frequency');
+        el.classList.remove('loading');
+        if (!commits || commits.length === 0) {
+            el.textContent = 'No recent commits';
+            return;
+        }
+        var now = Date.now();
+        var days = {};
+        var dayNames = [];
+        for (var i = 6; i >= 0; i--) {
+            var d = new Date(now - i * 24 * 3600000);
+            var key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+            days[key] = 0;
+            var weekday = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()];
+            dayNames.push({ key: key, label: weekday + ' ' + shortDate(d.toISOString()) });
+        }
+
+        commits.forEach(function(c) {
+            var d = new Date(c.commit.author.date);
+            var key = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+            if (days[key] !== undefined) days[key]++;
+        });
+
+        var maxCount = Math.max.apply(null, Object.values(days).concat([1]));
+        var html = '<div style="display:flex;flex-direction:column;gap:0.4rem;margin-top:0.5rem;">';
+        dayNames.forEach(function(day) {
+            var count = days[day.key];
+            var pct = Math.round((count / maxCount) * 100);
+            html += '<div style="display:flex;align-items:center;gap:0.75rem;">';
+            html += '<span style="width:80px;font-size:0.8rem;color:var(--muted);text-align:right;flex-shrink:0;">' + day.label + '</span>';
+            html += '<div style="flex:1;height:18px;background:var(--surface);border-radius:3px;overflow:hidden;">';
+            if (count > 0) {
+                html += '<div style="width:' + Math.max(pct, 4) + '%;height:100%;background:var(--accent);border-radius:3px;"></div>';
+            }
+            html += '</div>';
+            html += '<span style="width:24px;font-size:0.8rem;color:var(--muted);text-align:right;">' + count + '</span>';
+            html += '</div>';
+        });
+        html += '</div>';
+        el.innerHTML = html;
+    }
+
+    function escapeHtml(str) {
+        var div = document.createElement('div');
+        div.appendChild(document.createTextNode(str));
+        return div.innerHTML;
+    }
+
+    function showError(msg) {
+        document.getElementById('last-updated').textContent = msg;
+        document.getElementById('last-updated').style.color = 'var(--red)';
+    }
+
+    function loadDashboard() {
+        var startTime = Date.now();
+
+        Promise.all([
+            tracked(API + '/commits?per_page=30', 'commits'),
+            tracked(API + '/pulls?state=open&per_page=30', 'open_prs'),
+            tracked(API + '/issues?state=open&per_page=30', 'open_issues'),
+            tracked(API + '/pulls?state=closed&per_page=10&sort=updated&direction=desc', 'closed_prs'),
+            tracked(API + '/issues?state=closed&per_page=10&sort=updated&direction=desc', 'closed_issues')
+        ]).then(function(results) {
+            var commits = results[0];
+            var openPRs = results[1];
+            var openIssues = results[2].filter(function(i) { return !i.pull_request; });
+            var closedPRs = results[3];
+            var closedIssues = results[4].filter(function(i) { return !i.pull_request; });
+
+            // Filter to actually merged PRs
+            var mergedPRs = closedPRs.filter(function(pr) { return pr.merged_at; });
+
+            renderStatus(commits, openPRs, openIssues);
+            renderMergedPRs(mergedPRs.slice(0, 10));
+            renderClosedIssues(closedIssues.slice(0, 10));
+            renderPipelineStats(mergedPRs, closedIssues);
+            renderCommitFrequency(commits);
+
+            // Update metadata
+            var now = new Date();
+            document.getElementById('last-updated').textContent = 'Last updated: ' + now.toLocaleTimeString();
+
+            var cacheLabel = fromCacheCount === totalRequests ? 'Serving from cache' : (fromCacheCount > 0 ? 'Partially cached' : 'Fresh data');
+            document.getElementById('cache-status').innerHTML = '<span class="' + (fromCacheCount > 0 ? 'cached' : '') + '">' + cacheLabel + '</span> · ' + totalRequests + ' requests';
+        }).catch(function(err) {
+            if (err.message === 'rate-limited') {
+                showError('GitHub API rate limit reached. Cached data shown where available. Try again in a few minutes.');
+                // Try to show cached data anyway
+                var cachedCommits = getCached('commits');
+                var cachedOpenPRs = getCached('open_prs');
+                var cachedOpenIssues = getCached('open_issues');
+                var cachedClosedPRs = getCached('closed_prs');
+                var cachedClosedIssues = getCached('closed_issues');
+                if (cachedCommits) {
+                    var openIssues = cachedOpenIssues ? cachedOpenIssues.filter(function(i) { return !i.pull_request; }) : [];
+                    var closedIssues = cachedClosedIssues ? cachedClosedIssues.filter(function(i) { return !i.pull_request; }) : [];
+                    var mergedPRs = cachedClosedPRs ? cachedClosedPRs.filter(function(pr) { return pr.merged_at; }) : [];
+                    renderStatus(cachedCommits, cachedOpenPRs || [], openIssues);
+                    renderMergedPRs(mergedPRs.slice(0, 10));
+                    renderClosedIssues(closedIssues.slice(0, 10));
+                    renderPipelineStats(mergedPRs, closedIssues);
+                    renderCommitFrequency(cachedCommits);
+                    document.getElementById('cache-status').innerHTML = '<span class="cached">Showing cached data</span> · Rate limited';
+                }
+            } else {
+                showError('Failed to load dashboard data: ' + err.message);
+            }
+        });
+    }
+
+    loadDashboard();
+})();
 </script>
-
 </body>
 </html>
