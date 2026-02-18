@@ -1,10 +1,12 @@
-// buildings.js — Building definitions, placement, and 3D rendering
+// buildings.js — Building definitions, placement, upgrades, and 3D rendering
 // Buildings render as simple Three.js primitives (boxes, cylinders)
 
 import * as THREE from 'three';
 import { axialToWorld, HEX_SIZE } from './hex-grid.js';
 
 // Building type definitions
+// workerSlots: max workers that can be assigned
+// populationCap: added to settlement pop cap when complete
 export const BUILDING_TYPES = {
     town_center: {
         name: 'Town Center',
@@ -15,6 +17,8 @@ export const BUILDING_TYPES = {
         shape: 'box',
         color: 0xfbbf24,
         scale: { x: 0.5, y: 0.6, z: 0.5 },
+        workerSlots: 2,
+        populationCap: 5,
     },
     farm: {
         name: 'Farm',
@@ -25,6 +29,8 @@ export const BUILDING_TYPES = {
         shape: 'box',
         color: 0x4ade80,
         scale: { x: 0.6, y: 0.2, z: 0.6 },
+        workerSlots: 2,
+        populationCap: 3,
     },
     lumber_mill: {
         name: 'Lumber Mill',
@@ -35,6 +41,8 @@ export const BUILDING_TYPES = {
         shape: 'cylinder',
         color: 0xa3e635,
         scale: { x: 0.25, y: 0.5, z: 0.25 },
+        workerSlots: 2,
+        populationCap: 0,
     },
     quarry: {
         name: 'Quarry',
@@ -45,6 +53,8 @@ export const BUILDING_TYPES = {
         shape: 'cone',
         color: 0x94a3b8,
         scale: { x: 0.3, y: 0.5, z: 0.3 },
+        workerSlots: 2,
+        populationCap: 0,
     },
     mine: {
         name: 'Mine',
@@ -55,6 +65,8 @@ export const BUILDING_TYPES = {
         shape: 'box',
         color: 0xfbbf24,
         scale: { x: 0.3, y: 0.35, z: 0.3 },
+        workerSlots: 2,
+        populationCap: 0,
     },
     barracks: {
         name: 'Barracks',
@@ -65,6 +77,8 @@ export const BUILDING_TYPES = {
         shape: 'box',
         color: 0xef4444,
         scale: { x: 0.45, y: 0.4, z: 0.45 },
+        workerSlots: 1,
+        populationCap: 0,
     },
     mage_tower: {
         name: 'Mage Tower',
@@ -75,6 +89,8 @@ export const BUILDING_TYPES = {
         shape: 'cylinder',
         color: 0xa78bfa,
         scale: { x: 0.2, y: 0.8, z: 0.2 },
+        workerSlots: 1,
+        populationCap: 0,
     },
     walls: {
         name: 'Walls',
@@ -85,7 +101,22 @@ export const BUILDING_TYPES = {
         shape: 'box',
         color: 0x78716c,
         scale: { x: 0.7, y: 0.3, z: 0.1 },
+        workerSlots: 0,
+        populationCap: 0,
     },
+};
+
+// Upgrade costs per level (level 2 and level 3)
+export const UPGRADE_COSTS = {
+    2: { food: 15, wood: 25, stone: 20, gold: 15, mana: 0 },
+    3: { food: 30, wood: 50, stone: 40, gold: 30, mana: 5 },
+};
+
+// Level multipliers — applied to scale and resourcesPerTurn
+export const LEVEL_MULTIPLIERS = {
+    1: 1.0,
+    2: 1.3,
+    3: 1.6,
 };
 
 // Check if a building can be placed on a hex
@@ -118,6 +149,22 @@ export function canPlaceBuilding(buildingType, hexData, resources) {
     return { ok: true };
 }
 
+// Check if a building can be upgraded
+export function canUpgradeBuilding(building, resources) {
+    if (building.turnsRemaining > 0) return { ok: false, reason: 'Still under construction' };
+    if (building.level >= 3) return { ok: false, reason: 'Already max level' };
+
+    const nextLevel = building.level + 1;
+    const cost = UPGRADE_COSTS[nextLevel];
+    for (const [resource, amount] of Object.entries(cost)) {
+        if ((resources[resource] || 0) < amount) {
+            return { ok: false, reason: `Not enough ${resource}` };
+        }
+    }
+
+    return { ok: true, cost };
+}
+
 // Deduct building cost from resources
 export function deductCost(buildingType, resources) {
     const def = BUILDING_TYPES[buildingType];
@@ -128,32 +175,55 @@ export function deductCost(buildingType, resources) {
     return newResources;
 }
 
+// Deduct upgrade cost from resources
+export function deductUpgradeCost(level, resources) {
+    const cost = UPGRADE_COSTS[level];
+    const newResources = { ...resources };
+    for (const [resource, amount] of Object.entries(cost)) {
+        newResources[resource] -= amount;
+    }
+    return newResources;
+}
+
 // Create a 3D mesh for a building
-export function createBuildingMesh(buildingType, q, r, turnsRemaining) {
+export function createBuildingMesh(buildingType, q, r, turnsRemaining, level) {
+    if (level === undefined) level = 1;
     const def = BUILDING_TYPES[buildingType];
     const pos = axialToWorld(q, r);
+    const levelMul = LEVEL_MULTIPLIERS[level] || 1;
 
     const progressFraction = turnsRemaining > 0
         ? 1 - (turnsRemaining / def.turnsToBuild)
         : 1;
 
-    // Scale Y by construction progress (min 30% during construction)
+    // Scale Y by construction progress (min 30% during construction), then apply level multiplier
+    const baseY = def.scale.y * levelMul;
     const yScale = turnsRemaining > 0
-        ? def.scale.y * (0.3 + 0.7 * progressFraction)
-        : def.scale.y;
+        ? baseY * (0.3 + 0.7 * progressFraction)
+        : baseY;
+
+    const scaleX = def.scale.x * (level > 1 ? 1 + (level - 1) * 0.15 : 1);
+    const scaleZ = (def.scale.z || def.scale.x) * (level > 1 ? 1 + (level - 1) * 0.15 : 1);
 
     let geometry;
     if (def.shape === 'cylinder') {
-        geometry = new THREE.CylinderGeometry(def.scale.x, def.scale.x, yScale, 8);
+        geometry = new THREE.CylinderGeometry(scaleX, scaleX, yScale, 8);
     } else if (def.shape === 'cone') {
-        geometry = new THREE.ConeGeometry(def.scale.x, yScale, 8);
+        geometry = new THREE.ConeGeometry(scaleX, yScale, 8);
     } else {
-        geometry = new THREE.BoxGeometry(def.scale.x, yScale, def.scale.z);
+        geometry = new THREE.BoxGeometry(scaleX, yScale, scaleZ);
     }
 
     const opacity = turnsRemaining > 0 ? 0.5 + 0.5 * progressFraction : 1;
+
+    // Slightly brighten color at higher levels
+    const baseColor = new THREE.Color(def.color);
+    if (level > 1) {
+        baseColor.offsetHSL(0, 0, (level - 1) * 0.08);
+    }
+
     const material = new THREE.MeshStandardMaterial({
-        color: def.color,
+        color: baseColor,
         roughness: 0.6,
         metalness: 0.2,
         flatShading: true,
@@ -165,7 +235,7 @@ export function createBuildingMesh(buildingType, q, r, turnsRemaining) {
     // Place on top of the hex (HEX_HEIGHT = 0.3)
     mesh.position.set(pos.x, 0.3 + yScale / 2, pos.z);
 
-    mesh.userData = { buildingType, q, r };
+    mesh.userData = { buildingType, q, r, level };
     return mesh;
 }
 
@@ -192,4 +262,16 @@ export function updateBuildingMesh(mesh, buildingType, turnsRemaining) {
         mesh.material.transparent = false;
         mesh.material.opacity = 1;
     }
+}
+
+// Recalculate population cap from all completed buildings
+export function recalcPopulationCap(state) {
+    let cap = 0;
+    for (const b of state.buildings) {
+        if (b.turnsRemaining <= 0) {
+            const def = BUILDING_TYPES[b.type];
+            cap += (def.populationCap || 0) * (b.level || 1);
+        }
+    }
+    state.population.cap = cap;
 }
