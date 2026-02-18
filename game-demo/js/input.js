@@ -121,6 +121,15 @@ export function setupInput(camera, hexMeshes, hexData, callbacks) {
 
     // Click — select
     function onClick(event) {
+        // Ignore clicks on UI overlays
+        if (event.target.closest('#build-menu') ||
+            event.target.closest('#end-turn-btn') ||
+            event.target.closest('#race-select') ||
+            event.target.closest('#resource-bar') ||
+            event.target.closest('#turn-counter')) {
+            return;
+        }
+
         const hit = getIntersected(event);
         if (hit) {
             selectHex(hit.userData.key);
