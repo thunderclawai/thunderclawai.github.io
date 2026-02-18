@@ -1,19 +1,46 @@
-// turn.js — Turn system: end turn, gather resources, advance construction
+// turn.js — Turn system: end turn, gather resources, advance construction, hex improvements
 
-import { BUILDING_TYPES } from './buildings.js';
-import { gatherResources } from './resources.js';
+import { BUILDING_TYPES, recalcPopulationCap } from './buildings.js';
+import { gatherResources, TERRAIN_BONUSES } from './resources.js';
 
-// Process end of turn: gather resources, advance construction
-export function processTurn(state, onBuildingComplete) {
+// Process end of turn: gather resources, advance construction, process hex improvements
+// hexData: Map of "q,r" -> hex object (for terrain lookup)
+export function processTurn(state, onBuildingComplete, hexData) {
     state.turn += 1;
 
-    // Gather resources from completed buildings
+    const gathered = {}; // Track total gathered this turn for visualization
+
+    // Gather resources from completed buildings (scaled by worker ratio)
     for (const building of state.buildings) {
         if (building.turnsRemaining <= 0) {
             const def = BUILDING_TYPES[building.type];
-            const gathered = gatherResources(def, state.race);
-            for (const [resource, amount] of Object.entries(gathered)) {
-                state.resources[resource] = (state.resources[resource] || 0) + amount;
+            const maxWorkers = def.workerSlots || 0;
+            const workerRatio = maxWorkers > 0 ? (building.workers || 0) / maxWorkers : 1;
+
+            // Only produce if workers assigned (or no worker slots e.g. walls)
+            if (maxWorkers === 0 || workerRatio > 0) {
+                const res = gatherResources(def, state.race, workerRatio);
+                for (const [resource, amount] of Object.entries(res)) {
+                    state.resources[resource] = (state.resources[resource] || 0) + amount;
+                    gathered[resource] = (gathered[resource] || 0) + amount;
+                }
+
+                // Apply terrain bonus if hexData available
+                if (hexData) {
+                    const key = building.q + ',' + building.r;
+                    const hex = hexData.get(key);
+                    if (hex) {
+                        const tBonus = TERRAIN_BONUSES[hex.terrain];
+                        if (tBonus) {
+                            for (const [resource, amount] of Object.entries(tBonus)) {
+                                if (amount > 0) {
+                                    state.resources[resource] = (state.resources[resource] || 0) + amount;
+                                    gathered[resource] = (gathered[resource] || 0) + amount;
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -27,4 +54,36 @@ export function processTurn(state, onBuildingComplete) {
             }
         }
     }
+
+    // Advance hex improvements
+    if (state.hexImprovements) {
+        for (const imp of state.hexImprovements) {
+            if (imp.turnsRemaining > 0) {
+                imp.turnsRemaining -= 1;
+            }
+        }
+
+        // Apply completed hex improvement bonuses
+        for (const imp of state.hexImprovements) {
+            if (imp.turnsRemaining <= 0 && imp.bonus) {
+                for (const [resource, amount] of Object.entries(imp.bonus)) {
+                    if (amount > 0) {
+                        state.resources[resource] = (state.resources[resource] || 0) + amount;
+                        gathered[resource] = (gathered[resource] || 0) + amount;
+                    }
+                }
+            }
+        }
+    }
+
+    // Recalculate population cap
+    recalcPopulationCap(state);
+
+    // Population growth: +1 per turn if current < cap and enough food
+    if (state.population.current < state.population.cap && state.resources.food >= 5) {
+        state.population.current += 1;
+        state.resources.food -= 5;
+    }
+
+    return gathered;
 }

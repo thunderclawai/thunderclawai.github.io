@@ -67,10 +67,20 @@ export function setupInput(camera, hexMeshes, hexData, callbacks) {
 
         if (data.building) {
             const def = BUILDING_TYPES[data.building.type];
+            const level = data.building.level || 1;
+            const levelStr = level > 1 ? ' Lv.' + level : '';
             const status = data.building.turnsRemaining > 0
                 ? ' (building: ' + data.building.turnsRemaining + ' turns)'
                 : '';
-            html += '<div class="hex-building">' + def.name + status + '</div>';
+            html += '<div class="hex-building">' + def.name + levelStr + status + '</div>';
+        }
+
+        if (data.improvement) {
+            if (data.improvement.turnsRemaining > 0) {
+                html += '<div class="hex-building">Improving: ' + data.improvement.turnsRemaining + ' turns left</div>';
+            } else {
+                html += '<div class="hex-building">Improved</div>';
+            }
         }
 
         overlay.innerHTML = html;
@@ -126,7 +136,10 @@ export function setupInput(camera, hexMeshes, hexData, callbacks) {
             event.target.closest('#end-turn-btn') ||
             event.target.closest('#race-select') ||
             event.target.closest('#resource-bar') ||
-            event.target.closest('#turn-counter')) {
+            event.target.closest('#turn-counter') ||
+            event.target.closest('#pop-bar') ||
+            event.target.closest('#save-load-bar') ||
+            event.target.closest('#minimap')) {
             return;
         }
 

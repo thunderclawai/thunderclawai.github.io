@@ -1,4 +1,4 @@
-// resources.js — Resource definitions, gathering rates, and race bonuses
+// resources.js — Resource definitions, gathering rates, race bonuses, terrain bonuses
 
 export const RESOURCE_TYPES = ['food', 'wood', 'stone', 'gold', 'mana'];
 
@@ -25,12 +25,23 @@ export const RACE_BONUSES = {
     orc:   { food: 1, wood: 1,   stone: 1.5, gold: 1,   mana: 1 },
 };
 
+// Terrain bonuses — passive resource bonus per turn for buildings on matching terrain
+export const TERRAIN_BONUSES = {
+    plains:   { food: 1, wood: 0, stone: 0, gold: 0, mana: 0 },
+    forest:   { food: 0, wood: 1, stone: 0, gold: 0, mana: 0 },
+    mountain: { food: 0, wood: 0, stone: 1, gold: 0, mana: 0 },
+    desert:   { food: 0, wood: 0, stone: 0, gold: 1, mana: 0 },
+    water:    { food: 0, wood: 0, stone: 0, gold: 0, mana: 0 },
+};
+
 // Calculate gathered resources for a building given race bonuses
-export function gatherResources(buildingDef, race) {
+// workerRatio: fraction of worker slots filled (0 to 1), defaults to 1 for backward compat
+export function gatherResources(buildingDef, race, workerRatio) {
+    if (workerRatio === undefined) workerRatio = 1;
     const bonuses = RACE_BONUSES[race];
     const gathered = {};
     for (const [resource, amount] of Object.entries(buildingDef.resourcesPerTurn)) {
-        gathered[resource] = Math.floor(amount * (bonuses[resource] || 1));
+        gathered[resource] = Math.floor(amount * (bonuses[resource] || 1) * workerRatio);
     }
     return gathered;
 }
