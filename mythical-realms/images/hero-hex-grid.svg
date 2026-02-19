@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="960" height="540">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#161b22"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fbbf24" stop-opacity="0.3"/>
+      <stop offset="100%" stop-color="#fbbf24" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="960" height="540" fill="url(#sky)"/>
+  <!-- Hex grid -->
+  <g opacity="0.6" stroke="#fbbf24" stroke-width="1.5" fill="none">
+    <!-- Row 1 -->
+    <polygon points="200,120 230,103 260,120 260,153 230,170 200,153" fill="#1a2332"/>
+    <polygon points="260,120 290,103 320,120 320,153 290,170 260,153" fill="#1a3322"/>
+    <polygon points="320,120 350,103 380,120 380,153 350,170 320,153" fill="#1a3322"/>
+    <polygon points="380,120 410,103 440,120 440,153 410,170 380,153" fill="#1a2332"/>
+    <polygon points="440,120 470,103 500,120 500,153 470,170 440,153" fill="#2a1a1a"/>
+    <polygon points="500,120 530,103 560,120 560,153 530,170 500,153" fill="#1a3322"/>
+    <polygon points="560,120 590,103 620,120 620,153 590,170 560,153" fill="#1a2332"/>
+    <polygon points="620,120 650,103 680,120 680,153 650,170 620,153" fill="#1a3322"/>
+    <polygon points="680,120 710,103 740,120 740,153 710,170 680,153" fill="#1a2332"/>
+    <!-- Row 2 (offset) -->
+    <polygon points="230,170 260,153 290,170 290,203 260,220 230,203" fill="#1a3322"/>
+    <polygon points="290,170 320,153 350,170 350,203 320,220 290,203" fill="#1a2332"/>
+    <polygon points="350,170 380,153 410,170 410,203 380,220 350,203" fill="#2a2a1a"/>
+    <polygon points="410,170 440,153 470,170 470,203 440,220 410,203" fill="#1a3322"/>
+    <polygon points="470,170 500,153 530,170 530,203 500,220 470,203" fill="#1a3322"/>
+    <polygon points="530,170 560,153 590,170 590,203 560,220 530,203" fill="#1a2332"/>
+    <polygon points="590,170 620,153 650,170 650,203 620,220 590,203" fill="#2a1a1a"/>
+    <polygon points="650,170 680,153 710,170 710,203 680,220 650,203" fill="#1a3322"/>
+    <!-- Row 3 -->
+    <polygon points="200,220 230,203 260,220 260,253 230,270 200,253" fill="#1a2332"/>
+    <polygon points="260,220 290,203 320,220 320,253 290,270 260,253" fill="#1a3322"/>
+    <polygon points="320,220 350,203 380,220 380,253 350,270 320,253" fill="#1a3322"/>
+    <polygon points="380,220 410,203 440,220 440,253 410,270 380,253" fill="#1a2332"/>
+    <polygon points="440,220 470,203 500,220 500,253 470,270 440,253" fill="#1a3322"/>
+    <polygon points="500,220 530,203 560,220 560,253 530,270 500,253" fill="#2a2a1a"/>
+    <polygon points="560,220 590,203 620,220 620,253 590,270 560,253" fill="#1a3322"/>
+    <polygon points="620,220 650,203 680,220 680,253 650,270 620,253" fill="#1a2332"/>
+    <polygon points="680,220 710,203 740,220 740,253 710,270 680,253" fill="#1a3322"/>
+    <!-- Row 4 (offset) -->
+    <polygon points="230,270 260,253 290,270 290,303 260,320 230,303" fill="#2a1a1a"/>
+    <polygon points="290,270 320,253 350,270 350,303 320,320 290,303" fill="#1a3322"/>
+    <polygon points="350,270 380,253 410,270 410,303 380,320 350,303" fill="#1a3322"/>
+    <polygon points="410,270 440,253 470,270 470,303 440,320 410,303" fill="#1a2332"/>
+    <polygon points="470,270 500,253 530,270 530,303 500,320 470,303" fill="#1a3322"/>
+    <polygon points="530,270 560,253 590,270 590,303 560,320 530,303" fill="#1a2332"/>
+    <polygon points="590,270 620,253 650,270 650,303 620,320 590,303" fill="#1a3322"/>
+    <polygon points="650,270 680,253 710,270 710,303 680,320 650,303" fill="#2a2a1a"/>
+    <!-- Row 5 -->
+    <polygon points="200,320 230,303 260,320 260,353 230,370 200,353" fill="#1a3322"/>
+    <polygon points="260,320 290,303 320,320 320,353 290,370 260,353" fill="#1a2332"/>
+    <polygon points="320,320 350,303 380,320 380,353 350,370 320,353" fill="#2a2a1a"/>
+    <polygon points="380,320 410,303 440,320 440,353 410,370 380,353" fill="#1a3322"/>
+    <polygon points="440,320 470,303 500,320 500,353 470,370 440,353" fill="#1a2332"/>
+    <polygon points="500,320 530,303 560,320 560,353 530,370 500,353" fill="#1a3322"/>
+    <polygon points="560,320 590,303 620,320 620,353 590,370 560,353" fill="#1a2332"/>
+    <polygon points="620,320 650,303 680,320 680,353 650,370 620,353" fill="#1a3322"/>
+    <polygon points="680,320 710,303 740,320 740,353 710,370 680,353" fill="#1a2332"/>
+    <!-- Row 6 (offset) -->
+    <polygon points="230,370 260,353 290,370 290,403 260,420 230,403" fill="#1a3322"/>
+    <polygon points="290,370 320,353 350,370 350,403 320,420 290,403" fill="#1a2332"/>
+    <polygon points="350,370 380,353 410,370 410,403 380,420 350,403" fill="#1a3322"/>
+    <polygon points="410,370 440,353 470,370 470,403 440,420 410,403" fill="#2a1a1a"/>
+    <polygon points="470,370 500,353 530,370 530,403 500,420 470,403" fill="#1a3322"/>
+    <polygon points="530,370 560,353 590,370 590,403 560,420 530,403" fill="#1a3322"/>
+    <polygon points="590,370 620,353 650,370 650,403 620,420 590,403" fill="#1a2332"/>
+    <polygon points="650,370 680,353 710,370 710,403 680,420 650,403" fill="#1a3322"/>
+  </g>
+  <!-- Buildings -->
+  <g>
+    <!-- Town center -->
+    <rect x="425" y="195" width="30" height="25" fill="#fbbf24" rx="2" opacity="0.9"/>
+    <polygon points="425,195 440,180 455,195" fill="#e5ab1a"/>
+    <!-- Farms -->
+    <rect x="305" y="245" width="18" height="12" fill="#4ade80" rx="1" opacity="0.7"/>
+    <rect x="545" y="195" width="18" height="12" fill="#4ade80" rx="1" opacity="0.7"/>
+    <!-- Mine -->
+    <polygon points="360,195 370,182 380,195" fill="#94a3b8" opacity="0.8"/>
+    <rect x="358" y="195" width="24" height="10" fill="#64748b" rx="1" opacity="0.7"/>
+    <!-- Barracks -->
+    <rect x="485" y="295" width="22" height="18" fill="#ef4444" rx="1" opacity="0.7"/>
+    <rect x="489" y="289" width="14" height="6" fill="#dc2626" rx="1" opacity="0.6"/>
+  </g>
+  <!-- Units -->
+  <g>
+    <circle cx="350" cy="290" r="6" fill="#60a5fa" opacity="0.9"/>
+    <circle cx="340" cy="295" r="5" fill="#60a5fa" opacity="0.7"/>
+    <circle cx="530" cy="340" r="6" fill="#ef4444" opacity="0.9"/>
+    <circle cx="620" cy="290" r="5" fill="#ef4444" opacity="0.7"/>
+  </g>
+  <!-- Fog of war overlay -->
+  <g opacity="0.7">
+    <rect x="100" y="80" width="130" height="380" fill="#0d1117" rx="4"/>
+    <rect x="700" y="80" width="160" height="380" fill="#0d1117" rx="4"/>
+    <rect x="100" y="380" width="200" height="80" fill="#0d1117" rx="4"/>
+  </g>
+  <!-- Ambient glow -->
+  <circle cx="440" cy="200" r="120" fill="url(#glow)" opacity="0.4"/>
+</svg>
