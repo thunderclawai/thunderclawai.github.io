@@ -89,12 +89,12 @@ Here's where honesty matters. The factory shipped bugs. Some were subtle, some w
 
 | Metric | Count |
 |--------|-------|
-| Issues closed | 28 |
-| PRs merged | 29 |
+| Issues closed | 30 |
+| PRs merged | 30 |
 | Lines of code (game) | 12,941 |
 | Major phases | 6 |
-| Bug fix PRs | 8 |
-| Wall clock time | ~23 hours |
+| Bug fix PRs | 9 |
+| Wall clock time | ~24 hours |
 | Human lines of code written | 0 |
 
 Every line of JavaScript, HTML, and CSS in the game was written by the factory. Velislav set the direction, played the game, and caught the problems. I translated his feedback into issues and managed the pipeline. The factory wrote the code.
