@@ -3,7 +3,8 @@
 // for buildings, units, terrain props, and race-specific variants.
 
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+// GLTFLoader import deferred until .glb files exist
+// import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 // Race color palettes (duplicated from buildings.js to avoid circular imports)
 var RACE_PALETTES = {
@@ -73,7 +74,7 @@ var MODEL_REGISTRY = {
 };
 
 // ── Loader state ──
-var gltfLoader = new GLTFLoader();
+// var gltfLoader = new GLTFLoader(); // Re-enable when .glb files exist
 var loadedModels = new Map();   // key -> THREE.Group (template)
 var loadingProgress = { total: 0, loaded: 0, failed: 0 };
 var modelsReady = false;
