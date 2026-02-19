@@ -252,6 +252,11 @@ function init() {
         });
 
         applyFogOfWar(hexMeshes, hexData, visible, gameState.exploredHexes);
+
+        // Update input system so hover/click respects fog
+        if (input && input.setVisibleHexes) {
+            input.setVisibleHexes(visible);
+        }
     }
 
     function showMoveRange(unit) {
