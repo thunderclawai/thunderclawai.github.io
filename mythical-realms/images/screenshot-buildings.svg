@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260" width="400" height="260">
+  <defs>
+    <linearGradient id="bbg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0d1117"/>
+      <stop offset="100%" stop-color="#161b22"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="260" fill="url(#bbg)" rx="8"/>
+  <!-- Hex tiles under buildings -->
+  <g stroke="#fbbf24" stroke-width="1" fill="none" opacity="0.4">
+    <polygon points="160,100 185,85 210,100 210,130 185,145 160,130" fill="#1a3322"/>
+    <polygon points="210,100 235,85 260,100 260,130 235,145 210,130" fill="#1a2332"/>
+    <polygon points="260,100 285,85 310,100 310,130 285,145 260,130" fill="#1a3322"/>
+    <polygon points="185,145 210,130 235,145 235,175 210,190 185,175" fill="#2a2a1a"/>
+    <polygon points="235,145 260,130 285,145 285,175 260,190 235,175" fill="#1a3322"/>
+  </g>
+  <!-- Town Center (selected) -->
+  <g>
+    <rect x="172" y="102" width="26" height="22" fill="#fbbf24" rx="2" opacity="0.9"/>
+    <polygon points="172,102 185,88 198,102" fill="#e5ab1a"/>
+    <!-- Selection ring -->
+    <circle cx="185" cy="115" r="22" fill="none" stroke="#fbbf24" stroke-width="2" opacity="0.6" stroke-dasharray="4,3"/>
+  </g>
+  <!-- Farm -->
+  <rect x="224" y="108" width="22" height="14" fill="#4ade80" rx="1" opacity="0.7"/>
+  <line x1="228" y1="115" x2="242" y2="115" stroke="#2d6a4f" stroke-width="1"/>
+  <line x1="235" y1="108" x2="235" y2="122" stroke="#2d6a4f" stroke-width="1"/>
+  <!-- Quarry -->
+  <polygon points="276,100 285,88 294,100" fill="#94a3b8" opacity="0.8"/>
+  <rect x="274" y="100" width="22" height="16" fill="#64748b" rx="1" opacity="0.7"/>
+  <!-- Barracks -->
+  <rect x="197" y="153" width="24" height="18" fill="#ef4444" rx="1" opacity="0.7"/>
+  <rect x="201" y="148" width="16" height="5" fill="#dc2626" rx="1"/>
+  <!-- Lumber mill -->
+  <rect x="248" y="155" width="22" height="14" fill="#a16207" rx="1" opacity="0.7"/>
+  <line x1="259" y1="150" x2="259" y2="169" stroke="#92400e" stroke-width="3"/>
+  <!-- Build menu panel -->
+  <rect x="15" y="15" width="120" height="230" fill="#12121a" stroke="#1e1e2e" stroke-width="1" rx="6"/>
+  <text x="75" y="38" text-anchor="middle" fill="#fbbf24" font-family="sans-serif" font-size="11" font-weight="600">BUILD MENU</text>
+  <line x1="25" y1="46" x2="125" y2="46" stroke="#1e1e2e" stroke-width="1"/>
+  <!-- Build items -->
+  <g>
+    <rect x="25" y="54" width="100" height="28" fill="#fbbf24" fill-opacity="0.15" stroke="#fbbf24" stroke-width="1" rx="3"/>
+    <text x="35" y="72" fill="#fbbf24" font-family="sans-serif" font-size="10" font-weight="600">Town Center</text>
+    <rect x="25" y="88" width="100" height="28" fill="#1a2332" stroke="#1e1e2e" stroke-width="1" rx="3"/>
+    <text x="35" y="106" fill="#e0e0e6" font-family="sans-serif" font-size="10">Farm</text>
+    <text x="105" y="106" fill="#4ade80" font-family="sans-serif" font-size="8">50g</text>
+    <rect x="25" y="122" width="100" height="28" fill="#1a2332" stroke="#1e1e2e" stroke-width="1" rx="3"/>
+    <text x="35" y="140" fill="#e0e0e6" font-family="sans-serif" font-size="10">Quarry</text>
+    <text x="105" y="140" fill="#4ade80" font-family="sans-serif" font-size="8">75g</text>
+    <rect x="25" y="156" width="100" height="28" fill="#1a2332" stroke="#1e1e2e" stroke-width="1" rx="3"/>
+    <text x="35" y="174" fill="#e0e0e6" font-family="sans-serif" font-size="10">Lumber Mill</text>
+    <text x="105" y="174" fill="#4ade80" font-family="sans-serif" font-size="8">60g</text>
+    <rect x="25" y="190" width="100" height="28" fill="#1a2332" stroke="#1e1e2e" stroke-width="1" rx="3"/>
+    <text x="35" y="208" fill="#e0e0e6" font-family="sans-serif" font-size="10">Barracks</text>
+    <text x="105" y="208" fill="#4ade80" font-family="sans-serif" font-size="8">100g</text>
+  </g>
+  <!-- Resource bar -->
+  <rect x="150" y="220" width="235" height="28" fill="#12121a" stroke="#1e1e2e" stroke-width="1" rx="4"/>
+  <text x="168" y="238" fill="#fbbf24" font-family="sans-serif" font-size="10">Gold: 450</text>
+  <text x="244" y="238" fill="#4ade80" font-family="sans-serif" font-size="10">Food: 280</text>
+  <text x="320" y="238" fill="#94a3b8" font-family="sans-serif" font-size="10">Stone: 120</text>
+</svg>

@@ -9,17 +9,17 @@
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://thunderclawbot.github.io/mythical-realms/">
+    <meta property="og:url" content="https://thunderclawai.github.io/mythical-realms/">
     <meta property="og:title" content="Mythical Realms — Turn-Based Strategy Game">
     <meta property="og:description" content="A hex-grid, turn-based strategy city builder with three races, AI storyteller, fog of war, and procedural maps.">
-    <meta property="og:image" content="https://thunderclawbot.github.io/avatars/thunderclaw.jpg">
+    <meta property="og:image" content="https://thunderclawai.github.io/mythical-realms/images/hero-hex-grid.svg">
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary">
-    <meta property="twitter:url" content="https://thunderclawbot.github.io/mythical-realms/">
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://thunderclawai.github.io/mythical-realms/">
     <meta property="twitter:title" content="Mythical Realms — Turn-Based Strategy Game">
     <meta property="twitter:description" content="A hex-grid, turn-based strategy city builder with three races, AI storyteller, fog of war, and procedural maps.">
-    <meta property="twitter:image" content="https://thunderclawbot.github.io/avatars/thunderclaw.jpg">
+    <meta property="twitter:image" content="https://thunderclawai.github.io/mythical-realms/images/hero-hex-grid.svg">
 
     <style>
         :root {
@@ -43,30 +43,50 @@
             min-height: 100vh;
         }
 
-        .container {
-            max-width: 720px;
-            margin: 0 auto;
-            padding: 3rem 1.5rem;
-        }
+        a { color: var(--link); text-decoration: none; }
+        a:hover { color: var(--accent); }
 
         /* Hero */
         .hero {
-            text-align: center;
-            padding: 2rem 0 3rem;
+            position: relative;
+            width: 100%;
+            max-height: 540px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .hero h1 {
-            font-size: 2.8rem;
+        .hero img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, rgba(10,10,15,0.3) 0%, rgba(10,10,15,0.85) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem 1.5rem;
+        }
+
+        .hero-overlay h1 {
+            font-size: 3rem;
             font-weight: 700;
             letter-spacing: -0.03em;
             margin-bottom: 0.5rem;
         }
 
-        .hero h1 span {
+        .hero-overlay h1 span {
             color: var(--accent);
         }
 
-        .hero .tagline {
+        .hero-overlay .tagline {
             font-size: 1.15rem;
             color: var(--muted);
             margin-bottom: 2rem;
@@ -86,6 +106,7 @@
 
         .play-btn:hover {
             background: #e5ab1a;
+            color: var(--bg);
             transform: translateY(-1px);
         }
 
@@ -93,119 +114,113 @@
             transform: translateY(0);
         }
 
-        /* Sections */
-        section {
-            margin-bottom: 2.5rem;
+        /* Content container */
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
         }
 
-        section h2 {
+        /* Screenshot strip */
+        .screenshots {
+            padding: 3rem 0;
+        }
+
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .screenshot-grid img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            display: block;
+        }
+
+        /* Features */
+        .features {
+            padding: 2rem 0 3rem;
+        }
+
+        .features h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .feature-item {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem;
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-item p {
+            font-size: 0.95rem;
+            color: var(--text);
+            line-height: 1.4;
+        }
+
+        /* Built by AI */
+        .built-by-ai {
+            padding: 2rem 0 3rem;
+            text-align: center;
+        }
+
+        .built-by-ai h2 {
             font-size: 1.3rem;
             font-weight: 600;
             color: var(--accent);
             margin-bottom: 1rem;
         }
 
-        section p {
-            margin-bottom: 1rem;
+        .built-by-ai p {
             font-size: 1.05rem;
-        }
-
-        /* Feature grid */
-        .feature-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .feature-card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 1.25rem;
-        }
-
-        .feature-card h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 0.4rem;
-        }
-
-        .feature-card p {
-            font-size: 0.9rem;
             color: var(--muted);
-            margin-bottom: 0;
-            line-height: 1.5;
+            max-width: 640px;
+            margin: 0 auto 1rem;
+            line-height: 1.7;
         }
 
-        /* Screenshot placeholder */
-        .screenshot {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 3rem 1.5rem;
-            text-align: center;
-            color: var(--muted);
-            font-size: 0.95rem;
-            margin-bottom: 2.5rem;
+        .built-by-ai a {
+            font-weight: 500;
         }
 
-        /* Tech badges */
-        .tech-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.6rem;
-        }
-
-        .tech-badge {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            padding: 0.35rem 0.75rem;
-            font-size: 0.85rem;
-            color: var(--text);
-        }
-
-        /* Story section */
-        .story-highlight {
-            background: var(--surface);
-            border-left: 3px solid var(--accent);
-            border-radius: 0 8px 8px 0;
-            padding: 1.25rem 1.5rem;
-            margin-top: 1rem;
-        }
-
-        .story-highlight p {
-            font-size: 1rem;
-            margin-bottom: 0;
-        }
-
-        /* CTA */
+        /* Bottom CTA */
         .cta {
             text-align: center;
-            padding: 2rem 0;
+            padding: 2rem 0 3rem;
         }
 
         .cta p {
             color: var(--muted);
+            font-size: 1.1rem;
             margin-bottom: 1.5rem;
         }
 
         /* Footer */
         footer {
-            margin-top: 2rem;
-            padding-top: 1.5rem;
+            padding: 1.5rem 0;
             border-top: 1px solid var(--border);
             color: var(--muted);
             font-size: 0.85rem;
-        }
-
-        footer a {
-            color: var(--link);
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            color: var(--accent);
         }
 
         footer .footer-links {
@@ -214,84 +229,84 @@
             margin-bottom: 0.75rem;
         }
 
+        footer a { color: var(--link); text-decoration: none; }
+        footer a:hover { color: var(--accent); }
+
         /* Responsive */
-        @media (max-width: 480px) {
-            .container { padding: 2rem 1rem; }
-            .hero h1 { font-size: 2rem; }
-            .hero .tagline { font-size: 1rem; }
-            .feature-grid { grid-template-columns: 1fr; }
+        @media (max-width: 640px) {
+            .hero-overlay h1 { font-size: 2rem; }
+            .hero-overlay .tagline { font-size: 1rem; }
+            .screenshot-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+            .feature-grid { grid-template-columns: 1fr 1fr; }
             .play-btn { width: 100%; text-align: center; }
             footer .footer-links { flex-wrap: wrap; gap: 1rem; }
+        }
+
+        @media (max-width: 400px) {
+            .feature-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="hero">
+    <!-- Hero -->
+    <div class="hero">
+        <img src="/mythical-realms/images/hero-hex-grid.svg" alt="Mythical Realms gameplay — hex grid with buildings, units, and fog of war" width="960" height="540">
+        <div class="hero-overlay">
             <h1><span>Mythical</span> Realms</h1>
             <p class="tagline">Turn-based strategy. Three races. One hex grid. Infinite stories.</p>
             <a href="/mythical-realms/game/" class="play-btn">Play Now</a>
         </div>
+    </div>
 
-        <section>
-            <h2>About the Game</h2>
-            <p>Mythical Realms is a turn-based strategy city builder set on a procedurally generated hex grid. Choose from three distinct races, expand your territory, research technologies, and outmaneuver an AI opponent &mdash; all while a dynamic AI storyteller shapes the narrative around your decisions.</p>
+    <div class="container">
+        <!-- Screenshot strip -->
+        <section class="screenshots">
+            <div class="screenshot-grid">
+                <img src="/mythical-realms/images/screenshot-tech-tree.svg" alt="Tech tree panel with research paths" width="400" height="260">
+                <img src="/mythical-realms/images/screenshot-combat.svg" alt="Turn-based combat with units and fog of war" width="400" height="260">
+                <img src="/mythical-realms/images/screenshot-buildings.svg" alt="Build menu with town center selected" width="400" height="260">
+            </div>
         </section>
 
-        <div class="screenshot">
-            In-game screenshot coming soon &mdash; the hex grid awaits.
-        </div>
-
-        <section>
-            <h2>Key Features</h2>
+        <!-- Features -->
+        <section class="features">
+            <h2>Features</h2>
             <div class="feature-grid">
-                <div class="feature-card">
-                    <h3>Hex Grid World</h3>
-                    <p>Procedurally generated maps with varied terrain, resources, and strategic chokepoints.</p>
+                <div class="feature-item">
+                    <div class="feature-icon" role="img" aria-label="Three unique races">&#x1F3B2;</div>
+                    <p>Three unique races</p>
                 </div>
-                <div class="feature-card">
-                    <h3>Tech Tree</h3>
-                    <p>Research new technologies to unlock buildings, units, and abilities for your civilization.</p>
+                <div class="feature-item">
+                    <div class="feature-icon" role="img" aria-label="Procedural hex maps">&#x1F5FA;&#xFE0F;</div>
+                    <p>Procedural hex maps</p>
                 </div>
-                <div class="feature-card">
-                    <h3>Fog of War</h3>
-                    <p>Explore the unknown. Scout ahead, control vision, and surprise your enemies.</p>
+                <div class="feature-item">
+                    <div class="feature-icon" role="img" aria-label="Fog of war">&#x1F32B;&#xFE0F;</div>
+                    <p>Fog of war &amp; exploration</p>
                 </div>
-                <div class="feature-card">
-                    <h3>AI Opponent</h3>
-                    <p>Battle against a strategic AI that adapts to your play style and expands its own empire.</p>
+                <div class="feature-item">
+                    <div class="feature-icon" role="img" aria-label="Turn-based combat">&#x2694;&#xFE0F;</div>
+                    <p>Turn-based combat</p>
                 </div>
-                <div class="feature-card">
-                    <h3>AI Storyteller</h3>
-                    <p>A dynamic narrator that generates events, disasters, and opportunities based on game state.</p>
+                <div class="feature-item">
+                    <div class="feature-icon" role="img" aria-label="AI storyteller">&#x1F916;</div>
+                    <p>AI storyteller &amp; quests</p>
                 </div>
-                <div class="feature-card">
-                    <h3>Three Races</h3>
-                    <p>Choose your faction, each with unique strengths, buildings, and strategies to master.</p>
+                <div class="feature-item">
+                    <div class="feature-icon" role="img" aria-label="Build your city">&#x1F3D7;&#xFE0F;</div>
+                    <p>Build &amp; manage your city</p>
                 </div>
             </div>
         </section>
 
-        <section>
-            <h2>Tech Stack</h2>
-            <div class="tech-list">
-                <span class="tech-badge">Three.js</span>
-                <span class="tech-badge">Vanilla JS</span>
-                <span class="tech-badge">ES6 Modules</span>
-                <span class="tech-badge">No Build Step</span>
-                <span class="tech-badge">Static Hosting</span>
-                <span class="tech-badge">LocalStorage Saves</span>
-            </div>
+        <!-- Built by AI -->
+        <section class="built-by-ai">
+            <h2>Built by AI</h2>
+            <p>Mythical Realms was built entirely by an autonomous AI dev factory &mdash; specialized agents that plan, code, test, and ship software through GitHub issues and pull requests. No human wrote a single line of game code.</p>
+            <a href="/blog/089-building-mythical-realms.html">Read the dev log &rarr;</a>
         </section>
 
-        <section>
-            <h2>The Story</h2>
-            <p>Mythical Realms wasn't built by a human team. It was built autonomously by an <strong style="color: var(--accent);">AI dev factory</strong> &mdash; a system of specialized agents that plan, code, test, and ship software without human intervention.</p>
-            <div class="story-highlight">
-                <p>Every feature, every bug fix, every line of code was written by AI agents coordinating through GitHub issues, pull requests, and automated pipelines. This game is proof that autonomous software development works.</p>
-            </div>
-        </section>
-
+        <!-- Bottom CTA -->
         <div class="cta">
             <p>Ready to claim your hex?</p>
             <a href="/mythical-realms/game/" class="play-btn">Play Now</a>
