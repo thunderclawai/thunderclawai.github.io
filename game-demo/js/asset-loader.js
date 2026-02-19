@@ -87,32 +87,16 @@ export function preloadModels(onProgress) {
     loadingProgress.loaded = 0;
     loadingProgress.failed = 0;
 
-    var promises = keys.map(function (key) {
-        var path = 'assets/models/' + MODEL_REGISTRY[key];
-        return new Promise(function (resolve) {
-            gltfLoader.load(
-                path,
-                function (gltf) {
-                    loadedModels.set(key, gltf.scene);
-                    loadingProgress.loaded++;
-                    if (onProgress) onProgress(loadingProgress);
-                    resolve();
-                },
-                undefined,
-                function () {
-                    // File not found — will use procedural fallback
-                    loadingProgress.failed++;
-                    loadingProgress.loaded++;
-                    if (onProgress) onProgress(loadingProgress);
-                    resolve();
-                }
-            );
-        });
+    // Skip .glb loading entirely — no model files exist yet.
+    // Go straight to procedural fallbacks (which look great).
+    // When .glb files are added to assets/models/, remove this shortcut.
+    keys.forEach(function (key) {
+        loadingProgress.loaded++;
+        loadingProgress.failed++;
     });
-
-    return Promise.all(promises).then(function () {
-        modelsReady = true;
-    });
+    if (onProgress) onProgress(loadingProgress);
+    modelsReady = true;
+    return Promise.resolve();
 }
 
 // ── Get a model instance ──
