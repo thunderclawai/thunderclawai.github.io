@@ -307,8 +307,45 @@ export function trainUnit(unitType, gameState) {
     return unit;
 }
 
+// ── Shared geometry/material cache for primitive unit meshes (flyweight) ──
+var _unitGeometryCache = new Map(); // unitType -> geometry
+var _unitMaterialCache = new Map(); // cacheKey -> material
+var _heroRingGeoCache = new Map();  // unitType -> ring geometry
+
+function getSharedGeometry(unitType) {
+    if (_unitGeometryCache.has(unitType)) return _unitGeometryCache.get(unitType);
+    var def = UNIT_TYPES[unitType];
+    if (!def) return null;
+    var s = def.scale;
+    var geometry;
+    if (def.shape === 'cone') {
+        geometry = new THREE.ConeGeometry(s.x, s.y, 6);
+    } else if (def.shape === 'sphere') {
+        geometry = new THREE.SphereGeometry(s.x, 8, 6);
+    } else if (def.shape === 'cylinder') {
+        geometry = new THREE.CylinderGeometry(s.x * 0.6, s.x, s.y, 6);
+    } else {
+        geometry = new THREE.BoxGeometry(s.x, s.y, s.z);
+    }
+    _unitGeometryCache.set(unitType, geometry);
+    return geometry;
+}
+
+function getSharedMaterial(cacheKey, color, opts) {
+    if (_unitMaterialCache.has(cacheKey)) return _unitMaterialCache.get(cacheKey);
+    var mat = new THREE.MeshStandardMaterial(Object.assign({
+        color: color,
+        roughness: 0.5,
+        metalness: 0.3,
+        flatShading: true,
+    }, opts || {}));
+    _unitMaterialCache.set(cacheKey, mat);
+    return mat;
+}
+
 // ── Create unit 3D mesh ──
 // Uses the new asset pipeline with procedural model fallback
+// Primitive fallback uses shared geometry/material (flyweight pattern)
 export function createUnitMesh(unitType, q, r, race, owner) {
     var def = UNIT_TYPES[unitType];
     if (!def) return null;
@@ -338,8 +375,9 @@ export function createUnitMesh(unitType, q, r, race, owner) {
         return modelGroup;
     }
 
-    // ── Primitive fallback ──
+    // ── Primitive fallback (shared geometry + material) ──
     var baseColor;
+    var matKey = unitType + '_' + race;
     if (def.isHero) {
         baseColor = new THREE.Color(palette.accent);
     } else if (def.shape === 'sphere') {
@@ -348,40 +386,29 @@ export function createUnitMesh(unitType, q, r, race, owner) {
         baseColor = new THREE.Color(palette.secondary);
     }
 
-    var geometry;
-    var s = def.scale;
-    if (def.shape === 'cone') {
-        geometry = new THREE.ConeGeometry(s.x, s.y, 6);
-    } else if (def.shape === 'sphere') {
-        geometry = new THREE.SphereGeometry(s.x, 8, 6);
-    } else if (def.shape === 'cylinder') {
-        geometry = new THREE.CylinderGeometry(s.x * 0.6, s.x, s.y, 6);
-    } else {
-        geometry = new THREE.BoxGeometry(s.x, s.y, s.z);
-    }
-
-    var material = new THREE.MeshStandardMaterial({
-        color: baseColor,
-        roughness: 0.5,
-        metalness: 0.3,
-        flatShading: true,
-    });
+    var geometry = getSharedGeometry(unitType);
+    var material = getSharedMaterial(matKey, baseColor);
 
     var mesh = new THREE.Mesh(geometry, material);
-    var yBase = 0.3 + (def.shape === 'sphere' ? s.x : s.y / 2);
+    var yBase = 0.3 + (def.shape === 'sphere' ? def.scale.x : def.scale.y / 2);
     mesh.position.set(pos.x, yBase, pos.z);
     mesh.userData = { unitType: unitType, q: q, r: r, isUnit: true, baseY: yBase, isHero: !!def.isHero };
 
     if (def.isHero) {
-        var ringGeo = new THREE.RingGeometry(s.x + 0.05, s.x + 0.12, 16);
-        var ringMat = new THREE.MeshBasicMaterial({
+        var s = def.scale;
+        if (!_heroRingGeoCache.has(unitType)) {
+            _heroRingGeoCache.set(unitType, new THREE.RingGeometry(s.x + 0.05, s.x + 0.12, 16));
+        }
+        var ringGeo = _heroRingGeoCache.get(unitType);
+        // Hero ring needs its own material instance for opacity animation
+        var ringMatInst = new THREE.MeshBasicMaterial({
             color: palette.accent,
             side: THREE.DoubleSide,
             transparent: true,
             opacity: 0.6,
         });
-        ringMat._origOpacity = 0.6;
-        var ring = new THREE.Mesh(ringGeo, ringMat);
+        ringMatInst._origOpacity = 0.6;
+        var ring = new THREE.Mesh(ringGeo, ringMatInst);
         ring.rotation.x = -Math.PI / 2;
         ring.position.y = -s.y / 2 + 0.05;
         mesh.add(ring);

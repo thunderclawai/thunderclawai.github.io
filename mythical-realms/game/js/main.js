@@ -76,6 +76,10 @@ function init() {
     var unitMeshPool = [];
     var UNIT_POOL_MAX = 30;
 
+    // Separate pool for model groups (keyed by base unit type)
+    var modelGroupPool = new Map(); // unitType -> [group, group, ...]
+    var MODEL_POOL_MAX_PER_TYPE = 8;
+
     // Movement range highlight meshes
     var moveHighlights = [];
 
@@ -97,6 +101,24 @@ function init() {
 
     // Tutorial state
     var tutorialState = null;
+
+    // Cached visible hexes (recomputed once per turn cycle, not per rebuild call)
+    var _cachedVisibleHexes = null;
+    var _visibleHexesTurn = -1;
+
+    function getCachedVisibleHexes() {
+        if (_cachedVisibleHexes && _visibleHexesTurn === (gameState ? gameState.turn : -1)) {
+            return _cachedVisibleHexes;
+        }
+        _cachedVisibleHexes = getVisibleHexes(gameState, hexData);
+        _visibleHexesTurn = gameState ? gameState.turn : -1;
+        return _cachedVisibleHexes;
+    }
+
+    function invalidateVisibleHexesCache() {
+        _cachedVisibleHexes = null;
+        _visibleHexesTurn = -1;
+    }
 
     // DOM elements
     var raceSelectEl = document.getElementById('race-select');
@@ -1053,26 +1075,73 @@ function init() {
 
     // ── Unit Helpers ──
 
+    // Reset model group materials after defeat animation
+    function resetModelGroupMaterials(group) {
+        group.traverse(function (child) {
+            if (child.isMesh && child.material) {
+                if (Array.isArray(child.material)) {
+                    child.material.forEach(function (m) {
+                        m.opacity = m._origOpacity !== undefined ? m._origOpacity : 1;
+                        m.transparent = m.opacity < 1;
+                    });
+                } else {
+                    child.material.opacity = child.material._origOpacity !== undefined
+                        ? child.material._origOpacity : 1;
+                    child.material.transparent = child.material.opacity < 1;
+                }
+            }
+        });
+    }
+
     // Return a unit mesh to the object pool instead of disposing it
     function poolUnitMesh(mesh) {
         scene.remove(mesh);
         if (mesh.userData && mesh.userData.isModelGroup) {
-            // Model groups can't be easily reused, dispose them
-            disposeModel(mesh);
+            // Pool model groups by unit type for reuse
+            var uType = mesh.userData.unitType;
+            if (!modelGroupPool.has(uType)) {
+                modelGroupPool.set(uType, []);
+            }
+            var pool = modelGroupPool.get(uType);
+            if (pool.length < MODEL_POOL_MAX_PER_TYPE) {
+                mesh.visible = false;
+                mesh.scale.set(1, 1, 1);
+                resetModelGroupMaterials(mesh);
+                pool.push(mesh);
+            } else {
+                disposeModel(mesh);
+            }
             return;
         }
         if (unitMeshPool.length < UNIT_POOL_MAX) {
             mesh.visible = false;
             unitMeshPool.push(mesh);
         } else {
-            if (mesh.geometry) mesh.geometry.dispose();
-            if (mesh.material) mesh.material.dispose();
+            // Geometry and material are shared (flyweight), don't dispose them.
+            // Only dispose per-instance child materials (e.g. hero ring).
+            for (var ci = 0; ci < mesh.children.length; ci++) {
+                var ch = mesh.children[ci];
+                if (ch.material && ch.material._origOpacity !== undefined) {
+                    ch.material.dispose();
+                }
+            }
         }
     }
 
     // Get a mesh from pool or create new
     function getUnitMesh(unitType, q, r, race, owner) {
         var pos = axialToWorld(q, r);
+        // Try model group pool first
+        var mgPool = modelGroupPool.get(unitType);
+        if (mgPool && mgPool.length > 0) {
+            var mg = mgPool.pop();
+            mg.position.set(pos.x, mg.userData.baseY, pos.z);
+            mg.scale.set(1, 1, 1);
+            mg.userData.q = q;
+            mg.userData.r = r;
+            mg.visible = true;
+            return mg;
+        }
         // Try to reuse a pooled mesh of the same type
         for (var p = 0; p < unitMeshPool.length; p++) {
             var pooled = unitMeshPool[p];
@@ -1112,7 +1181,7 @@ function init() {
 
         if (!gameState || !gameState.units) return;
 
-        var visible = getVisibleHexes(gameState, hexData);
+        var visible = getCachedVisibleHexes();
 
         // Player units
         for (var i = 0; i < gameState.units.length; i++) {
@@ -1162,7 +1231,7 @@ function init() {
 
         if (!aiState || !gameState) return;
 
-        var visible = getVisibleHexes(gameState, hexData);
+        var visible = getCachedVisibleHexes();
 
         for (var i = 0; i < aiState.buildings.length; i++) {
             var b = aiState.buildings[i];
@@ -1179,7 +1248,8 @@ function init() {
 
     function updateFogOfWar() {
         if (!gameState) return;
-        var visible = getVisibleHexes(gameState, hexData);
+        invalidateVisibleHexesCache();
+        var visible = getCachedVisibleHexes();
 
         visible.forEach(function (key) {
             if (gameState.exploredHexes.indexOf(key) === -1) {
@@ -2222,7 +2292,7 @@ function init() {
                 ctx.fillRect(abx + pad2, aby + pad2, cellW - pad2 * 2, cellH - pad2 * 2);
             }
             if (aiState.units) {
-                var visibleForMinimap = getVisibleHexes(gameState, hexData);
+                var visibleForMinimap = getCachedVisibleHexes();
                 for (var aui = 0; aui < aiState.units.length; aui++) {
                     var aUnit = aiState.units[aui];
                     if (aUnit.turnsToReady > 0) continue;
@@ -2240,7 +2310,7 @@ function init() {
 
         // Fog of war on minimap
         if (gameState) {
-            var visible = getVisibleHexes(gameState, hexData);
+            var visible = getCachedVisibleHexes();
             var exploredSet = new Set(gameState.exploredHexes);
             hexData.forEach(function (hex, key) {
                 if (!visible.has(key) && !exploredSet.has(key)) {
@@ -2517,7 +2587,7 @@ function init() {
         }
 
         // Compute visible hexes for fog-of-war replay filtering
-        var replayVisible = getVisibleHexes(gameState, hexData);
+        var replayVisible = getCachedVisibleHexes();
 
         // Play player turn animations (player events are all on player hexes, so visible)
         var animCtx = { controls: controls, camera: camera, scene: scene, visibleHexes: replayVisible };
@@ -2704,6 +2774,15 @@ function init() {
         // Check for victory/defeat
         checkGameEnd();
 
+        // Log memory stats per turn for leak detection
+        if (typeof console !== 'undefined') {
+            console.log('[Turn ' + gameState.turn + '] Three.js memory — geometries: ' +
+                renderer.info.memory.geometries + ', textures: ' + renderer.info.memory.textures +
+                ' | scene children: ' + scene.children.length +
+                ' | unit pool: ' + unitMeshPool.length +
+                ' | floating DOM: ' + document.querySelectorAll('.floating-number').length);
+        }
+
         // Re-enable button
         endTurnBtn.disabled = false;
 
@@ -2802,7 +2881,7 @@ function init() {
             renderer.render(scene, camera);
         }
 
-        // FPS counter update
+        // FPS counter update (includes memory monitoring)
         if (fpsVisible) {
             fpsFrames++;
             var now = performance.now();
@@ -2810,7 +2889,11 @@ function init() {
                 var fps = Math.round(fpsFrames * 1000 / (now - fpsLastTime));
                 var drawCalls = renderer.info.render.calls;
                 var tris = renderer.info.render.triangles;
-                fpsEl.textContent = fps + ' FPS | ' + drawCalls + ' draws | ' + (tris > 999 ? (tris / 1000).toFixed(1) + 'k' : tris) + ' tris';
+                var geoCount = renderer.info.memory.geometries;
+                var texCount = renderer.info.memory.textures;
+                fpsEl.textContent = fps + ' FPS | ' + drawCalls + ' draws | ' +
+                    (tris > 999 ? (tris / 1000).toFixed(1) + 'k' : tris) + ' tris | ' +
+                    geoCount + ' geo | ' + texCount + ' tex';
                 fpsFrames = 0;
                 fpsLastTime = now;
             }

@@ -237,18 +237,20 @@ export function animateBuildingComplete(mesh, scene, durationMs) {
 }
 
 // ── Particle burst helper ──
+// Uses a single shared material per burst to reduce allocations
 function spawnParticleBurst(scene, position, count, color) {
     if (!count) count = 8;
     if (!color) color = 0xfbbf24;
 
+    var sharedMat = new THREE.SpriteMaterial({
+        color: new THREE.Color(color),
+        transparent: true,
+        opacity: 1,
+    });
+
     var particles = [];
     for (var i = 0; i < count; i++) {
-        var mat = new THREE.SpriteMaterial({
-            color: new THREE.Color(color),
-            transparent: true,
-            opacity: 1,
-        });
-        var sprite = new THREE.Sprite(mat);
+        var sprite = new THREE.Sprite(sharedMat);
         sprite.scale.set(0.12, 0.12, 0.12);
         sprite.position.copy(position);
         scene.add(sprite);
@@ -263,6 +265,13 @@ function spawnParticleBurst(scene, position, count, color) {
         });
     }
 
+    function cleanup() {
+        for (var p = 0; p < particles.length; p++) {
+            scene.remove(particles[p].sprite);
+        }
+        sharedMat.dispose();
+    }
+
     // Animate particles over 300ms
     tween(300, function (t) {
         for (var p = 0; p < particles.length; p++) {
@@ -270,27 +279,33 @@ function spawnParticleBurst(scene, position, count, color) {
             part.sprite.position.x = position.x + part.vx * t;
             part.sprite.position.y = position.y + part.vy * t;
             part.sprite.position.z = position.z + part.vz * t;
-            part.sprite.material.opacity = 1 - t;
+            sharedMat.opacity = 1 - t;
         }
-    }).then(function () {
-        for (var p = 0; p < particles.length; p++) {
-            scene.remove(particles[p].sprite);
-            particles[p].sprite.material.dispose();
-        }
-    });
+    }).then(cleanup, cleanup); // cleanup on both resolve and reject
 }
 
 // ── Floating resource number (+N) rising from buildings ──
 // Creates a DOM overlay element that rises and fades.
+// Capped to MAX_FLOATING_NUMBERS to prevent DOM bloat.
+var _activeFloatingNumbers = [];
+var MAX_FLOATING_NUMBERS = 20;
+
 export function spawnFloatingNumber(text, worldPos, camera, color) {
     if (!camera || !worldPos) return;
     if (!color) color = '#fbbf24';
+
+    // Enforce cap — remove oldest if at limit
+    while (_activeFloatingNumbers.length >= MAX_FLOATING_NUMBERS) {
+        var oldest = _activeFloatingNumbers.shift();
+        if (oldest && oldest.parentNode) oldest.parentNode.removeChild(oldest);
+    }
 
     var el = document.createElement('div');
     el.className = 'floating-number';
     el.textContent = text;
     el.style.color = color;
     document.body.appendChild(el);
+    _activeFloatingNumbers.push(el);
 
     // Project world position to screen
     var vec = new THREE.Vector3(worldPos.x, worldPos.y + 0.5, worldPos.z);
@@ -298,6 +313,12 @@ export function spawnFloatingNumber(text, worldPos, camera, color) {
     var startTime = performance.now();
     var duration = 1200 / Math.max(0.25, _speedMultiplier);
     if (_skipRequested) duration = 0;
+
+    function removeEl() {
+        if (el.parentNode) el.parentNode.removeChild(el);
+        var idx = _activeFloatingNumbers.indexOf(el);
+        if (idx >= 0) _activeFloatingNumbers.splice(idx, 1);
+    }
 
     function updatePosition() {
         var elapsed = performance.now() - startTime;
@@ -315,14 +336,14 @@ export function spawnFloatingNumber(text, worldPos, camera, color) {
         if (t < 1 && !_skipRequested) {
             requestAnimationFrame(updatePosition);
         } else {
-            if (el.parentNode) el.parentNode.removeChild(el);
+            removeEl();
         }
     }
 
     if (duration > 0) {
         requestAnimationFrame(updatePosition);
     } else {
-        if (el.parentNode) el.parentNode.removeChild(el);
+        removeEl();
     }
 }
 
