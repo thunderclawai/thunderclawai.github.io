@@ -380,6 +380,7 @@ export function createUnitMesh(unitType, q, r, race, owner) {
             transparent: true,
             opacity: 0.6,
         });
+        ringMat._origOpacity = 0.6;
         var ring = new THREE.Mesh(ringGeo, ringMat);
         ring.rotation.x = -Math.PI / 2;
         ring.position.y = -s.y / 2 + 0.05;

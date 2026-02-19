@@ -488,7 +488,7 @@ export function createBuildingMesh(buildingType, q, r, turnsRemaining, level, ra
         geometry = new THREE.BoxGeometry(scaleX, yScale, scaleZ);
     }
 
-    const opacity = turnsRemaining > 0 ? 0.5 + 0.5 * progressFraction : 1;
+    var buildOpacity = turnsRemaining > 0 ? 0.5 + 0.5 * progressFraction : 1;
 
     var colorHex = race ? getBuildingColor(buildingType, race) : def.color;
     const baseColor = new THREE.Color(colorHex);
@@ -502,7 +502,7 @@ export function createBuildingMesh(buildingType, q, r, turnsRemaining, level, ra
         metalness: 0.2,
         flatShading: true,
         transparent: turnsRemaining > 0,
-        opacity,
+        opacity: buildOpacity,
     });
 
     const mesh = new THREE.Mesh(geometry, material);
