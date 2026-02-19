@@ -80,9 +80,9 @@
         /* Controls hint */
         .hud-controls {
             position: fixed;
-            bottom: 1rem;
+            bottom: 11rem;
             left: 1rem;
-            z-index: 10;
+            z-index: 9;
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 8px;
@@ -105,7 +105,7 @@
         /* Hex info overlay */
         #hex-info {
             position: fixed;
-            top: 1rem;
+            top: 3.5rem;
             right: 1rem;
             z-index: 10;
             background: var(--surface);
@@ -261,7 +261,7 @@
         #turn-counter {
             position: fixed;
             top: 1rem;
-            right: 10rem;
+            right: 6rem;
             z-index: 10;
             background: var(--surface);
             border: 1px solid var(--border);
@@ -286,12 +286,23 @@
             font-weight: 700;
         }
 
-        /* End Turn button */
-        #end-turn-btn {
+        /* ── Bottom Bar ── */
+        #bottom-bar {
             position: fixed;
             bottom: 1rem;
             right: 1rem;
             z-index: 10;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        #bottom-bar.visible {
+            display: flex;
+        }
+
+        /* End Turn button */
+        #end-turn-btn {
             background: var(--accent);
             color: var(--bg);
             border: none;
@@ -301,12 +312,7 @@
             font-weight: 700;
             font-family: inherit;
             cursor: pointer;
-            display: none;
             transition: background 0.2s, transform 0.1s;
-        }
-
-        #end-turn-btn.visible {
-            display: block;
         }
 
         #end-turn-btn:hover {
@@ -319,16 +325,8 @@
 
         /* Save/Load bar */
         #save-load-bar {
-            position: fixed;
-            bottom: 1rem;
-            right: 10rem;
-            z-index: 10;
-            display: none;
-            gap: 0.4rem;
-        }
-
-        #save-load-bar.visible {
             display: flex;
+            gap: 0.4rem;
         }
 
         #save-load-bar button {
@@ -347,31 +345,32 @@
             border-color: var(--accent);
         }
 
-        /* Tech tree button */
-        #tech-tree-btn {
-            position: fixed;
-            bottom: 1rem;
-            right: 18rem;
-            z-index: 10;
+        /* Bottom bar tab buttons */
+        .bottom-tab-btn {
             background: var(--surface);
-            border: 1px solid var(--accent-dim);
+            border: 1px solid var(--border);
             border-radius: 6px;
             padding: 0.4rem 0.8rem;
             font-size: 0.8rem;
             font-family: inherit;
-            color: var(--accent);
+            color: var(--text);
             cursor: pointer;
-            display: none;
             transition: border-color 0.2s, transform 0.1s;
         }
 
-        #tech-tree-btn.visible {
-            display: block;
-        }
-
-        #tech-tree-btn:hover {
+        .bottom-tab-btn:hover {
             border-color: var(--accent);
             transform: translateY(-1px);
+        }
+
+        #tech-tree-btn {
+            color: var(--accent);
+            border-color: var(--accent-dim);
+        }
+
+        #build-btn {
+            color: var(--accent);
+            border-color: var(--accent-dim);
         }
 
         /* Build menu panel */
@@ -501,7 +500,7 @@
         /* Minimap */
         #minimap {
             position: fixed;
-            bottom: 5rem;
+            bottom: 1rem;
             left: 1rem;
             z-index: 10;
             background: var(--surface);
@@ -952,30 +951,6 @@
         }
 
         /* ── Event Log Panel ── */
-        #event-log-btn {
-            position: fixed;
-            bottom: 1rem;
-            right: 23rem;
-            z-index: 10;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 0.4rem 0.8rem;
-            font-size: 0.8rem;
-            font-family: inherit;
-            color: var(--text);
-            cursor: pointer;
-            display: none;
-            transition: border-color 0.2s;
-        }
-
-        #event-log-btn.visible {
-            display: block;
-        }
-
-        #event-log-btn:hover {
-            border-color: var(--accent);
-        }
 
         #event-log-panel {
             position: fixed;
@@ -1115,7 +1090,7 @@
         /* ── Combat Log ── */
         #combat-log {
             position: fixed;
-            bottom: 9rem;
+            bottom: 11rem;
             left: 1rem;
             z-index: 10;
             background: var(--surface);
@@ -1456,8 +1431,7 @@
         #sound-controls {
             position: fixed;
             top: 1rem;
-            left: 50%;
-            transform: translateX(calc(-50% + 200px));
+            right: 1rem;
             z-index: 10;
             display: none;
             gap: 0.3rem;
@@ -2012,12 +1986,7 @@
                 padding: 0.5rem 1rem;
             }
 
-            #tech-tree-btn {
-                min-height: 44px;
-                padding: 0.5rem 1rem;
-            }
-
-            #event-log-btn {
+            .bottom-tab-btn {
                 min-height: 44px;
                 padding: 0.5rem 1rem;
             }
@@ -2164,7 +2133,7 @@
             /* Minimap - smaller, bottom-left */
             #minimap {
                 display: block;
-                bottom: 4.5rem;
+                bottom: 0.5rem;
                 left: 0.5rem;
                 padding: 0.25rem;
             }
@@ -2183,10 +2152,17 @@
                 font-size: 0.78rem;
             }
 
-            /* End turn - large touch-friendly, bottom-right */
-            #end-turn-btn {
+            /* Bottom bar - wrap for mobile */
+            #bottom-bar {
                 bottom: 0.5rem;
                 right: 0.5rem;
+                left: 0.5rem;
+                flex-wrap: wrap;
+                justify-content: flex-end;
+                gap: 0.4rem;
+            }
+
+            #end-turn-btn {
                 padding: 0.8rem 1.2rem;
                 font-size: 1rem;
                 border-radius: 12px;
@@ -2194,36 +2170,16 @@
                 min-height: 52px;
             }
 
-            /* Save/Load - repositioned */
-            #save-load-bar {
-                bottom: 0.5rem;
-                right: auto;
-                left: 50%;
-                transform: translateX(-50%);
+            .bottom-tab-btn {
+                font-size: 0.72rem;
+                padding: 0.3rem 0.6rem;
             }
 
-            /* Tech tree button */
-            #tech-tree-btn {
-                bottom: 0.5rem;
-                right: auto;
-                left: 0.5rem;
-                position: fixed;
-            }
-
-            /* Event log button */
-            #event-log-btn {
-                bottom: 3.5rem;
-                left: 0.5rem;
-                right: auto;
-            }
-
-            /* Sound controls */
+            /* Sound controls - move to bottom on mobile */
             #sound-controls {
                 top: auto;
                 bottom: 3.5rem;
-                left: auto;
                 right: 0.5rem;
-                transform: none;
             }
 
             /* Combat log - compact */
@@ -2231,7 +2187,7 @@
                 max-width: 200px;
                 font-size: 0.7rem;
                 top: auto;
-                bottom: 4.5rem;
+                bottom: 5rem;
                 right: 0.5rem;
                 left: auto;
             }
@@ -2621,17 +2577,17 @@
         <span class="turn-number" id="turn-number">1</span>
     </div>
 
-    <!-- End Turn button -->
-    <button id="end-turn-btn">End Turn</button>
-
-    <!-- Save/Load -->
-    <div id="save-load-bar">
-        <button id="save-btn">Save</button>
-        <button id="load-btn">Load</button>
+    <!-- Bottom Bar: tab buttons + save/load + end turn -->
+    <div id="bottom-bar">
+        <button id="event-log-btn" class="bottom-tab-btn">Event Log</button>
+        <button id="tech-tree-btn" class="bottom-tab-btn">Tech Tree</button>
+        <button id="build-btn" class="bottom-tab-btn">Build</button>
+        <div id="save-load-bar">
+            <button id="save-btn">Save</button>
+            <button id="load-btn">Load</button>
+        </div>
+        <button id="end-turn-btn">End Turn</button>
     </div>
-
-    <!-- Tech Tree button -->
-    <button id="tech-tree-btn">Tech Tree</button>
 
     <!-- Build menu (shown when hex selected) -->
     <div id="build-menu"></div>
@@ -2670,9 +2626,6 @@
         <div class="quest-panel-title">Active Quests</div>
         <div id="quest-panel-content"></div>
     </div>
-
-    <!-- Event Log Button -->
-    <button id="event-log-btn">Event Log</button>
 
     <!-- Event Log Panel (full-screen overlay) -->
     <div id="event-log-panel">

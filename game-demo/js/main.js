@@ -104,6 +104,8 @@ function init() {
     var turnCounterEl = document.getElementById('turn-counter');
     var turnNumberEl = document.getElementById('turn-number');
     var endTurnBtn = document.getElementById('end-turn-btn');
+    var bottomBarEl = document.getElementById('bottom-bar');
+    var buildBtn = document.getElementById('build-btn');
     var buildMenuEl = document.getElementById('build-menu');
     var popBarEl = document.getElementById('pop-bar');
     var minimapCanvas = document.getElementById('minimap-canvas');
@@ -572,14 +574,13 @@ function init() {
         mpStatusEl.classList.add('visible');
         mpChatToggle.classList.add('visible');
         // Hide save/load in multiplayer
-        document.getElementById('save-load-bar').classList.remove('visible');
+        document.getElementById('save-load-bar').style.display = 'none';
     }
 
     function updateMpTurnUI() {
         if (!isMultiplayerActive()) return;
         if (getIsMyTurn()) {
             mpWaiting.classList.remove('visible');
-            endTurnBtn.classList.add('visible');
             endTurnBtn.disabled = false;
         } else {
             mpWaiting.classList.add('visible');
@@ -862,11 +863,8 @@ function init() {
         raceSelectEl.classList.add('hidden');
         resourceBarEl.classList.add('visible');
         turnCounterEl.classList.add('visible');
-        endTurnBtn.classList.add('visible');
         popBarEl.classList.add('visible');
-        document.getElementById('save-load-bar').classList.add('visible');
-        if (techTreeBtn) techTreeBtn.classList.add('visible');
-        if (eventLogBtn) eventLogBtn.classList.add('visible');
+        if (bottomBarEl) bottomBarEl.classList.add('visible');
         if (soundControlsEl) soundControlsEl.classList.add('visible');
 
         updateResourceBar();
@@ -1041,11 +1039,8 @@ function init() {
             // Hide HUD
             resourceBarEl.classList.remove('visible');
             turnCounterEl.classList.remove('visible');
-            endTurnBtn.classList.remove('visible');
             popBarEl.classList.remove('visible');
-            document.getElementById('save-load-bar').classList.remove('visible');
-            if (techTreeBtn) techTreeBtn.classList.remove('visible');
-            if (eventLogBtn) eventLogBtn.classList.remove('visible');
+            if (bottomBarEl) bottomBarEl.classList.remove('visible');
             if (soundControlsEl) soundControlsEl.classList.remove('visible');
             if (questPanelEl) questPanelEl.classList.remove('visible');
             if (researchStatusEl) researchStatusEl.classList.remove('visible');
@@ -2085,6 +2080,16 @@ function init() {
             } else {
                 renderTechTree();
                 techTreePanel.classList.add('visible');
+            }
+        });
+    }
+
+    if (buildBtn) {
+        buildBtn.addEventListener('click', function () {
+            if (buildMenuEl.classList.contains('visible')) {
+                hideBuildMenu();
+            } else if (inputApi && inputApi.getSelectedKey()) {
+                showBuildMenu(inputApi.getSelectedKey());
             }
         });
     }
