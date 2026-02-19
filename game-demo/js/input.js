@@ -16,6 +16,7 @@ const SELECT_EMISSIVE = 0xfbbf24;
 export function setupInput(camera, hexMeshes, hexData, callbacks) {
     let hoveredMesh = null;
     let selectedKey = null;
+    let visibleHexSet = new Set(); // Track which hexes are currently visible (not fogged)
 
     const meshArray = Array.from(hexMeshes.values());
     const overlay = document.getElementById('hex-info');
@@ -44,6 +45,8 @@ export function setupInput(camera, hexMeshes, hexData, callbacks) {
 
     function setHover(mesh) {
         if (mesh.userData.key === selectedKey) return;
+        // Don't hover on fogged hexes
+        if (!visibleHexSet.has(mesh.userData.key)) return;
         if (!mesh._originalMaterial) {
             mesh._originalMaterial = mesh.material;
         }
@@ -56,6 +59,11 @@ export function setupInput(camera, hexMeshes, hexData, callbacks) {
 
     function updateOverlay(key) {
         if (!key) {
+            overlay.classList.remove('visible');
+            return;
+        }
+        // Don't show info for fogged hexes
+        if (!visibleHexSet.has(key)) {
             overlay.classList.remove('visible');
             return;
         }
@@ -169,7 +177,7 @@ export function setupInput(camera, hexMeshes, hexData, callbacks) {
         }
 
         const hit = getIntersected(event);
-        if (hit) {
+        if (hit && visibleHexSet.has(hit.userData.key)) {
             selectHex(hit.userData.key);
         } else {
             selectHex(null);
@@ -184,6 +192,9 @@ export function setupInput(camera, hexMeshes, hexData, callbacks) {
         getSelectedKey: function () { return selectedKey; },
         refreshSelection: function () {
             updateOverlay(selectedKey);
+        },
+        setVisibleHexes: function (hexSet) {
+            visibleHexSet = hexSet;
         },
     };
 }
