@@ -3,8 +3,7 @@
 // for buildings, units, terrain props, and race-specific variants.
 
 import * as THREE from 'three';
-// GLTFLoader import deferred until .glb files exist
-// import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 // Race color palettes (duplicated from buildings.js to avoid circular imports)
 var RACE_PALETTES = {
@@ -74,10 +73,11 @@ var MODEL_REGISTRY = {
 };
 
 // ── Loader state ──
-// var gltfLoader = new GLTFLoader(); // Re-enable when .glb files exist
+var gltfLoader = new GLTFLoader();
 var loadedModels = new Map();   // key -> THREE.Group (template)
 var loadingProgress = { total: 0, loaded: 0, failed: 0 };
 var modelsReady = false;
+var MODELS_BASE = 'assets/models/';
 
 // ── Preload all models ──
 // Attempts to load .glb files. If any fail, procedural fallbacks are used.
@@ -88,16 +88,33 @@ export function preloadModels(onProgress) {
     loadingProgress.loaded = 0;
     loadingProgress.failed = 0;
 
-    // Skip .glb loading entirely — no model files exist yet.
-    // Go straight to procedural fallbacks (which look great).
-    // When .glb files are added to assets/models/, remove this shortcut.
-    keys.forEach(function (key) {
-        loadingProgress.loaded++;
-        loadingProgress.failed++;
+    var promises = keys.map(function (key) {
+        var path = MODELS_BASE + MODEL_REGISTRY[key];
+        return new Promise(function (resolve) {
+            gltfLoader.load(
+                path,
+                function (gltf) {
+                    // Success — store the scene as template
+                    loadedModels.set(key, gltf.scene);
+                    loadingProgress.loaded++;
+                    if (onProgress) onProgress(loadingProgress);
+                    resolve();
+                },
+                undefined, // onProgress per-file (unused)
+                function () {
+                    // Failed to load — procedural fallback will be used
+                    loadingProgress.loaded++;
+                    loadingProgress.failed++;
+                    if (onProgress) onProgress(loadingProgress);
+                    resolve();
+                }
+            );
+        });
     });
-    if (onProgress) onProgress(loadingProgress);
-    modelsReady = true;
-    return Promise.resolve();
+
+    return Promise.all(promises).then(function () {
+        modelsReady = true;
+    });
 }
 
 // ── Get a model instance ──
