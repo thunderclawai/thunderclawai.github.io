@@ -1,5 +1,5 @@
 // Service Worker for Mythical Realms PWA
-var CACHE_NAME = 'mythical-realms-v1';
+var CACHE_NAME = 'mythical-realms-v2';
 
 var ASSETS_TO_CACHE = [
     '/game-demo/',
@@ -26,7 +26,26 @@ var ASSETS_TO_CACHE = [
     '/game-demo/js/supabase-config.js',
     '/game-demo/manifest.json',
     '/game-demo/icons/icon-192.png',
-    '/game-demo/icons/icon-512.png'
+    '/game-demo/icons/icon-512.png',
+    '/game-demo/assets/models/props/tree_oak.glb',
+    '/game-demo/assets/models/props/tree_pine.glb',
+    '/game-demo/assets/models/props/tree_willow.glb',
+    '/game-demo/assets/models/props/rock_large.glb',
+    '/game-demo/assets/models/props/rock_small.glb',
+    '/game-demo/assets/models/props/grass.glb',
+    '/game-demo/assets/models/buildings/town_center.glb',
+    '/game-demo/assets/models/buildings/farm.glb',
+    '/game-demo/assets/models/buildings/lumber_mill.glb',
+    '/game-demo/assets/models/buildings/quarry.glb',
+    '/game-demo/assets/models/buildings/mine.glb',
+    '/game-demo/assets/models/buildings/barracks.glb',
+    '/game-demo/assets/models/buildings/mage_tower.glb',
+    '/game-demo/assets/models/buildings/walls.glb',
+    '/game-demo/assets/models/units/worker.glb',
+    '/game-demo/assets/models/units/warrior.glb',
+    '/game-demo/assets/models/units/archer.glb',
+    '/game-demo/assets/models/units/mage.glb',
+    '/game-demo/assets/models/units/hero.glb'
 ];
 
 // CDN assets cached on first use (network-first)
